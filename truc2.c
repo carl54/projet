@@ -7,7 +7,7 @@
 #define SCREEN_HEIGHT 400
 #define MAP_WIDTH 12
 #define MAP_HEIGHT 12
-#define WALL_WIDTH 32
+#define WALL_WIDTH 16
 #define PERSO_WIDTH 16
 #define fov M_PI/3
 
@@ -54,70 +54,74 @@ void fillMat(char map[], char mat[][24]){
 
 void HandleEvent(SDL_Event event)
 {
-    switch (event.type)
-    {
-        // close button clicked
-        case SDL_QUIT:
-            gameover = 1;
-            break;
-
-            // handle the keyboard
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
-            {
-                case SDLK_ESCAPE:
-                case SDLK_q:
-                    gameover = 1;
-                    break;
-                case SDLK_LEFT:
-                    if (map[((perso_x-400-PERSO_WIDTH)/WALL_WIDTH)+((perso_y/WALL_WIDTH))*MAP_WIDTH] != '#'){ //#=mur
-                        map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-                        perso_x = perso_x-PERSO_WIDTH;
-                    }
-                    if(mat_perso[perso_x-1][perso_y]!='#'){
-                        mat_perso[perso_x][perso_y]=' ';
-                        mat_perso[perso_x-1][perso_y]='0';
-                        perso_x--;
-                    }
-                    break;
-                case SDLK_RIGHT:
-                    if (map[((perso_x-400+PERSO_WIDTH)/WALL_WIDTH)+((perso_y/WALL_WIDTH))*MAP_WIDTH] != '#'){
-                        map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-                        perso_x = perso_x+PERSO_WIDTH;
-                        if(mat_perso[perso_x+1][perso_y]!='#'){
-                            mat_perso[perso_x][perso_y]=' ';
-                            mat_perso[perso_x+1][perso_y]='0';
-                            perso_x++;
-                        }
-                        break;
-                        case SDLK_UP:
-                            if (map[((perso_x-400)/WALL_WIDTH)+((perso_y-PERSO_WIDTH)/WALL_WIDTH)*MAP_WIDTH] != '#'){
-                                map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-                                perso_y = perso_y-PERSO_WIDTH;
-                            }
-                        if(mat_perso[perso_x][perso_y-1]!='#'){
-                            mat_perso[perso_x][perso_y]=' ';
-                            mat_perso[perso_x][perso_y-1]='0';
-                            perso_y--;
-                        }
-                        break;
-                        case SDLK_DOWN:
-                            if (map[((perso_x-400)/WALL_WIDTH)+((perso_y+PERSO_WIDTH)/WALL_WIDTH)*MAP_WIDTH] != '#'){
-                                map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-                                perso_y = perso_y+PERSO_WIDTH;
-                            }
-                        if(mat_perso[perso_x][perso_y+1]!='#'){
-                            mat_perso[perso_x][perso_y]=' ';
-                            mat_perso[perso_x][perso_y+1]='0';
-                            perso_y++;
-                        }
-                        break;
-                    }
-                    break;
-            }
-
-    }
+   switch (event.type)
+       {
+       // close button clicked
+     case SDL_QUIT:
+	   gameover = 1;
+             break;
+	     
+             // handle the keyboard
+     case SDL_KEYDOWN:
+	   switch (event.key.keysym.sym)
+             {
+	     case SDLK_ESCAPE:
+	     case SDLK_q:
+	       gameover = 1;
+	       break;
+	     case SDLK_LEFT:
+	       /*if (map[((perso_x-400-PERSO_WIDTH)/WALL_WIDTH)+((perso_y/WALL_WIDTH))*MAP_WIDTH] != '#'){ //#=mur
+		 map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
+		 perso_x = perso_x-PERSO_WIDTH;
+		 }*/
+	       if(mat_perso[perso_y][perso_x-1]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_x--;
+		 mat_perso[perso_y][perso_x]='0';
+                 
+	       }
+	       break;
+	     case SDLK_RIGHT:
+	       /* if (map[((perso_x-400+PERSO_WIDTH)/WALL_WIDTH)+((perso_y/WALL_WIDTH))*MAP_WIDTH] != '#'){
+		  map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
+		  perso_x = perso_x+PERSO_WIDTH;*/
+	       if(mat_perso[perso_y][perso_x+1]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_x++;
+		 mat_perso[perso_y][perso_x]='0';
+                 
+	       }
+	       break;
+	     case SDLK_UP:
+	       /*if (map[((perso_x-400)/WALL_WIDTH)+((perso_y-PERSO_WIDTH)/WALL_WIDTH)*MAP_WIDTH] != '#'){
+		 map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
+		 perso_y = perso_y-PERSO_WIDTH;
+		 }*/
+	       if(mat_perso[perso_y-1][perso_x]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_y--;
+		 mat_perso[perso_y][perso_x]='0';
+                 
+	       } 
+	       break;
+	     case SDLK_DOWN:
+	       /*if (map[((perso_x-400)/WALL_WIDTH)+((perso_y+PERSO_WIDTH)/WALL_WIDTH)*MAP_WIDTH] != '#'){
+		 map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
+		 perso_y = perso_y+PERSO_WIDTH;
+		 }*/
+	       if(mat_perso[perso_y+1][perso_x]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_y++;
+		 mat_perso[perso_y][perso_x]='0';
+                 
+	       }
+	       break;
+	     }
+	   break;
+       }
+   printf("x=%d, y=%d, %c\n",perso_x,perso_y,mat_perso[perso_x][perso_y]);
 }
+
 
 
 void draw(SDL_Surface *screen, int perso_x, int perso_y){
@@ -126,30 +130,30 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
     int w = screen->w/2;
     SDL_Rect wall,perso,tmp;
     SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,255,255,255));
-    for (i=0;i<MAP_WIDTH;i++){
-        for (j=0;j<MAP_HEIGHT;j++){
-            if (map[i+j*MAP_WIDTH] == '#'){
+    for (i=0;i<24;i++){
+        for (j=0;j<24;j++){
+            if (mat_perso[j][i] == '#'){
                 wall.w = WALL_WIDTH;
                 wall.h = WALL_WIDTH;
                 wall.x = i*WALL_WIDTH+w;
                 wall.y = j*WALL_WIDTH;
                 SDL_FillRect(screen,&wall,SDL_MapRGB(screen->format,255,0,0));
             }
-            else{
-                perso.w = PERSO_WIDTH;
-                perso.h = PERSO_WIDTH;
-                perso.x = perso_x;
-                perso.y = perso_y;
-                SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
-            }
         }
     }
+    perso.w = PERSO_WIDTH;
+    perso.h = PERSO_WIDTH;
+    perso.x = perso_x*PERSO_WIDTH+400;
+    perso.y = perso_y*PERSO_WIDTH;
+    //printf("x=%d ,y=%d\n",perso_x,perso_y);
+    SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
+    /*
     a=M_PI/2;
     for (i=0; i<w; i++) { // draw the "3D" view + visibility cone
         float ca = (1.-i/float(w)) * (a-fov/2.) + i/float(w)*(a+fov/2.);
         for (float t=0; t<20; t+=.05) {
             float cx = x+cos(ca)*t;
-            float cy = y+sin(ca)*t;
+            float cy = y+sin(ca)*0.5*t;
 
             int idx = int(cx)+int(cy)*MAP_WIDTH;
             if (map[idx]!=' ') {
@@ -168,7 +172,7 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
                 break;
             }
         }
-    }
+	}*/
 }
 
 int main (int argc, char*args[]){
@@ -202,6 +206,8 @@ int main (int argc, char*args[]){
         for(j=0;j<24;j++){
             if(mat_perso[i][j]!='#'){
                 mat_perso[i][j]='0';
+		perso_x=j;
+		perso_y=i;
                 goto label;
 
             }
@@ -214,21 +220,20 @@ int main (int argc, char*args[]){
         }
         printf("\n");
     }
-    /*while (!gameover){
+    while (!gameover){
         SDL_Event event;
 
         // look for an event
         if (SDL_PollEvent(&event)) {
             HandleEvent(event);
         }
-        map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = '%';
         draw(screen,perso_x,perso_y);
 
         // update the screen
         SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
     //SDL_FreeSurface(screen);
-    SDL_Quit();*/
+    SDL_Quit();
 
     return 0;
 
