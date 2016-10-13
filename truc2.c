@@ -12,14 +12,14 @@
 #define fov M_PI/3
 
 int gameover;
-float x = 6;
-float y = 5;
+float x = 8;
+float y = 16;
 int perso_x,perso_y; //coordonnees du personnage
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 ############\
 #  #    #  #\
 #  #  ###  #\
-#  #  #    #\
+## #  #    #\
 #  #     ###\
 #  ##      #\
 #     ###  #\
@@ -70,10 +70,6 @@ void HandleEvent(SDL_Event event)
 	       gameover = 1;
 	       break;
 	     case SDLK_LEFT:
-	       /*if (map[((perso_x-400-PERSO_WIDTH)/WALL_WIDTH)+((perso_y/WALL_WIDTH))*MAP_WIDTH] != '#'){ //#=mur
-		 map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-		 perso_x = perso_x-PERSO_WIDTH;
-		 }*/
 	       if(mat_perso[perso_y][perso_x-1]!='#'){
 		 mat_perso[perso_y][perso_x]=' ';
 		 perso_x--;
@@ -82,9 +78,6 @@ void HandleEvent(SDL_Event event)
 	       }
 	       break;
 	     case SDLK_RIGHT:
-	       /* if (map[((perso_x-400+PERSO_WIDTH)/WALL_WIDTH)+((perso_y/WALL_WIDTH))*MAP_WIDTH] != '#'){
-		  map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-		  perso_x = perso_x+PERSO_WIDTH;*/
 	       if(mat_perso[perso_y][perso_x+1]!='#'){
 		 mat_perso[perso_y][perso_x]=' ';
 		 perso_x++;
@@ -93,10 +86,6 @@ void HandleEvent(SDL_Event event)
 	       }
 	       break;
 	     case SDLK_UP:
-	       /*if (map[((perso_x-400)/WALL_WIDTH)+((perso_y-PERSO_WIDTH)/WALL_WIDTH)*MAP_WIDTH] != '#'){
-		 map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-		 perso_y = perso_y-PERSO_WIDTH;
-		 }*/
 	       if(mat_perso[perso_y-1][perso_x]!='#'){
 		 mat_perso[perso_y][perso_x]=' ';
 		 perso_y--;
@@ -105,10 +94,6 @@ void HandleEvent(SDL_Event event)
 	       } 
 	       break;
 	     case SDLK_DOWN:
-	       /*if (map[((perso_x-400)/WALL_WIDTH)+((perso_y+PERSO_WIDTH)/WALL_WIDTH)*MAP_WIDTH] != '#'){
-		 map[(perso_x-400)/WALL_WIDTH+perso_y/WALL_WIDTH*MAP_WIDTH] = ' ';
-		 perso_y = perso_y+PERSO_WIDTH;
-		 }*/
 	       if(mat_perso[perso_y+1][perso_x]!='#'){
 		 mat_perso[perso_y][perso_x]=' ';
 		 perso_y++;
@@ -119,7 +104,6 @@ void HandleEvent(SDL_Event event)
 	     }
 	   break;
        }
-   printf("x=%d, y=%d, %c\n",perso_x,perso_y,mat_perso[perso_x][perso_y]);
 }
 
 
@@ -145,34 +129,33 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
     perso.h = PERSO_WIDTH;
     perso.x = perso_x*PERSO_WIDTH+400;
     perso.y = perso_y*PERSO_WIDTH;
-    //printf("x=%d ,y=%d\n",perso_x,perso_y);
     SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
-    /*
-    a=M_PI/2;
+    
+    a=M_PI*2;
     for (i=0; i<w; i++) { // draw the "3D" view + visibility cone
         float ca = (1.-i/float(w)) * (a-fov/2.) + i/float(w)*(a+fov/2.);
         for (float t=0; t<20; t+=.05) {
             float cx = x+cos(ca)*t;
-            float cy = y+sin(ca)*0.5*t;
+            float cy = y+sin(ca)*t;
 
             int idx = int(cx)+int(cy)*MAP_WIDTH;
-            if (map[idx]!=' ') {
+            if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]!=' ') {
                 int h = screen->h/t;
                 tmp.w = 1;
                 tmp.h = h;
                 tmp.x = i;
                 tmp.y = (screen->h-h)/2;
                 //(screen->h-h)/2
-                if (map[idx]=='#'){
+                if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]=='#'){
                     SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
                 }
-                else {
+                if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]=='0') {
                     SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 0,0));
                 }
                 break;
             }
         }
-	}*/
+    }
 }
 
 int main (int argc, char*args[]){
@@ -204,8 +187,8 @@ int main (int argc, char*args[]){
     //placement du perso dans la premiere case vide de la matrice
     for(i=0;i<24;i++){
         for(j=0;j<24;j++){
-            if(mat_perso[i][j]!='#'){
-                mat_perso[i][j]='0';
+            if(mat_perso[j][i]!='#'){
+                mat_perso[j][i]='0';
 		perso_x=j;
 		perso_y=i;
                 goto label;
@@ -214,12 +197,12 @@ int main (int argc, char*args[]){
         }
     }
     label:
-    for(int i=0;i<24;i++){
+    /*for(int i=0;i<24;i++){
         for(int j=0;j<24;j++){
             printf("%c", mat_perso[i][j]);
         }
         printf("\n");
-    }
+	}*/
     while (!gameover){
         SDL_Event event;
 
