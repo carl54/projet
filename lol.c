@@ -136,22 +136,22 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
     //M_PI*2 regarde en bas
     //M_PI regarde en haut 
     //(3*M_PI)/2 regarde a gauche
-    a=M_PI*2;
+    a=M_PI;
     for (i=0; i<w; i++) { // draw the "3D" view + visibility cone
       float ca = a-(fov/2)+i*(fov/w);
         for (float t=0; t<48; t+=.05) {
             //perso_x+0.5-cos(ca)*t si regarde gauche ou droite
 	    float cx = perso_x+0.5+cos(ca)*t;
 	    //perso_y+0.5-sin(ca)*t si regarde haut ou bas
-            float cy = perso_y+0.5+sin(ca)*t;
+            float cy = perso_y+0.5-sin(ca)*t;
             int idx = int(cx)+int(cy)*MAP_WIDTH;
             if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]!=' ') {
 	      dist = sqrt(pow((perso_x-cx),2)+pow((perso_y-cy),2));
-                int h =20*WALL_WIDTH/dist;
+                int h = 20*WALL_WIDTH/dist;
                 tmp.w = 1;
                 tmp.h = h;
                 tmp.x = i;
-                tmp.y = WALL_WIDTH-h/2;
+                tmp.y = (screen->h-h)/2;
                 //(screen->h-h)/2
                 if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]=='#'){
                     SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
