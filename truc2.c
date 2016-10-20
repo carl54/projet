@@ -5,8 +5,8 @@
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 400
-#define MAP_WIDTH 12
-#define MAP_HEIGHT 12
+#define MAP_WIDTH 24 
+#define MAP_HEIGHT 24
 #define WALL_WIDTH 16
 #define PERSO_WIDTH 16
 #define fov M_PI/3
@@ -70,34 +70,34 @@ void HandleEvent(SDL_Event event)
 	       gameover = 1;
 	       break;
 	     case SDLK_LEFT:
-	       if(mat_perso[perso_y][perso_x-1]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_x--;
-		 mat_perso[perso_y][perso_x]='0';
+	       if(mat_perso[perso_x][perso_y-1]!='#'){
+		 mat_perso[perso_x][perso_y]=' ';
+		 perso_y--;
+		 mat_perso[perso_x][perso_y]='0';
                  
 	       }
 	       break;
 	     case SDLK_RIGHT:
-	       if(mat_perso[perso_y][perso_x+1]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_x++;
-		 mat_perso[perso_y][perso_x]='0';
+	       if(mat_perso[perso_x][perso_y+1]!='#'){
+		 mat_perso[perso_x][perso_y]=' ';
+		 perso_y++;
+		 mat_perso[perso_x][perso_y]='0';
                  
 	       }
 	       break;
 	     case SDLK_UP:
-	       if(mat_perso[perso_y-1][perso_x]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_y--;
-		 mat_perso[perso_y][perso_x]='0';
+	       if(mat_perso[perso_x-1][perso_y]!='#'){
+		 mat_perso[perso_x][perso_y]=' ';
+		 perso_x--;
+		 mat_perso[perso_x][perso_y]='0';
                  
 	       } 
 	       break;
 	     case SDLK_DOWN:
-	       if(mat_perso[perso_y+1][perso_x]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_y++;
-		 mat_perso[perso_y][perso_x]='0';
+	       if(mat_perso[perso_x+1][perso_y]!='#'){
+		 mat_perso[perso_x][perso_y]=' ';
+		 perso_x++;
+		 mat_perso[perso_x][perso_y]='0';
                  
 	       }
 	       break;
@@ -127,17 +127,18 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
     }
     perso.w = PERSO_WIDTH;
     perso.h = PERSO_WIDTH;
-    perso.x = perso_x*PERSO_WIDTH+400;
-    perso.y = perso_y*PERSO_WIDTH;
+    perso.x = perso_y*PERSO_WIDTH+400;
+    perso.y = perso_x*PERSO_WIDTH;
     SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
-    
-    a=M_PI*2;
+    //M_PI/2 regarde a droite
+    //M_PI*2 regarde en bas
+    //M_PI regarde en haut 
+    a=M_PI;
     for (i=0; i<w; i++) { // draw the "3D" view + visibility cone
         float ca = (1.-i/float(w)) * (a-fov/2.) + i/float(w)*(a+fov/2.);
         for (float t=0; t<20; t+=.05) {
-            float cx = x+cos(ca)*t;
-            float cy = y+sin(ca)*t;
-
+            float cx = perso_x+cos(ca)*t;
+            float cy = perso_y+sin(ca)*t;
             int idx = int(cx)+int(cy)*MAP_WIDTH;
             if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]!=' ') {
                 int h = screen->h/t;
@@ -148,14 +149,17 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
                 //(screen->h-h)/2
                 if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]=='#'){
                     SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
+		break;
                 }
-                if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]=='0') {
-                    SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 0,0));
-                }
-                break;
+               // if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]=='0') {
+               //     SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 0,0));
+               // }
+               // break;
             }
         }
     }
+
+
 }
 
 int main (int argc, char*args[]){
@@ -197,12 +201,12 @@ int main (int argc, char*args[]){
         }
     }
     label:
-    /*for(int i=0;i<24;i++){
+    for(int i=0;i<24;i++){
         for(int j=0;j<24;j++){
             printf("%c", mat_perso[i][j]);
         }
         printf("\n");
-	}*/
+	}
     while (!gameover){
         SDL_Event event;
 
