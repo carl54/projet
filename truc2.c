@@ -69,6 +69,7 @@ void HandleEvent(SDL_Event event)
 	     case SDLK_q:
 	       gameover = 1;
 	       break;
+		//tourner le perso a gauche
 	     case SDLK_LEFT:
 	       if(mat_perso[perso_x][perso_y-1]!='#'){
 		 mat_perso[perso_x][perso_y]=' ';
@@ -77,6 +78,7 @@ void HandleEvent(SDL_Event event)
                  
 	       }
 	       break;
+		//tourner le perso a droite
 	     case SDLK_RIGHT:
 	       if(mat_perso[perso_x][perso_y+1]!='#'){
 		 mat_perso[perso_x][perso_y]=' ';
@@ -133,12 +135,15 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
     //M_PI/2 regarde a droite
     //M_PI*2 regarde en bas
     //M_PI regarde en haut 
-    a=M_PI;
+    //(3*M_PI)/2 regarde a gauche
+    a=M_PI*2;
     for (i=0; i<w; i++) { // draw the "3D" view + visibility cone
         float ca = (1.-i/float(w)) * (a-fov/2.) + i/float(w)*(a+fov/2.);
-        for (float t=0; t<20; t+=.05) {
-            float cx = perso_x+cos(ca)*t;
-            float cy = perso_y+sin(ca)*t;
+        for (float t=0; t<48; t+=.05) {
+            //perso_x+0.5-cos(ca)*t si regarde gauche ou droite
+	    float cx = perso_x+0.5+cos(ca)*t;
+	    //perso_y+0.5-sin(ca)*t si regarde haut ou bas
+            float cy = perso_y+0.5-sin(ca)*t;
             int idx = int(cx)+int(cy)*MAP_WIDTH;
             if (mat_perso[idx%MAP_WIDTH][idx/MAP_WIDTH]!=' ') {
                 int h = screen->h/t;
