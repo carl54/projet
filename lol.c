@@ -1,4 +1,4 @@
-//g++ truc2.c `sdl-config --cflags --libs` -o truc
+//g++ lol.c `sdl-config --cflags --libs` -o lol
 #include "SDL.h"
 #include <stdlib.h>
 #include <math.h>
