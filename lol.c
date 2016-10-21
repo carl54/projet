@@ -12,9 +12,7 @@
 #define FOV M_PI/3
 
 int gameover;
-float x = 8;
-float y = 16;
-int perso_x,perso_y; //coordonnees du personnage
+float perso_angle,perso_x,perso_y;
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 ############\
 ## #    #  #\
@@ -70,38 +68,38 @@ void HandleEvent(SDL_Event event)
 	       gameover = 1;
 	       break;
 		//tourner le perso a gauche
-	     case SDLK_LEFT:
-	       if(mat_perso[perso_y][perso_x-1]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_x--;
-		 mat_perso[perso_y][perso_x]='0';
-                 
-	       }
-	       break;
-		//tourner le perso a droite
 	     case SDLK_RIGHT:
-	       if(mat_perso[perso_y][perso_x+1]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_x++;
-		 mat_perso[perso_y][perso_x]='0';
-                 
+	       if(perso_angle > 11*M_PI/6){
+		 perso_angle = perso_angle-2*M_PI;
 	       }
+	       perso_angle=perso_angle+M_PI/6;
 	       break;
+
+		//tourner le perso a droite
+	     case SDLK_LEFT:
+	       if (perso_angle < M_PI/6){
+		 perso_angle = perso_angle+2*M_PI;
+	       }
+	       perso_angle = perso_angle-M_PI/6;
+	       break;
+
 	     case SDLK_UP:
-	       if(mat_perso[perso_y-1][perso_x]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_y--;
-		 mat_perso[perso_y][perso_x]='0';
+	       if(mat_perso[int(perso_y-sin(perso_angle))][int(perso_x+cos(perso_angle))]!='#'){
+		 mat_perso[int(perso_y)][int(perso_x)]=' ';
+		 perso_x = perso_x+cos(perso_angle);
+		 perso_y = perso_y-sin(perso_angle);
+		 mat_perso[int(perso_y)][int(perso_x)]='0';
                  
 	       } 
 	       break;
 	     case SDLK_DOWN:
-	       if(mat_perso[perso_y+1][perso_x]!='#'){
-		 mat_perso[perso_y][perso_x]=' ';
-		 perso_y++;
-		 mat_perso[perso_y][perso_x]='0';
+	      if(mat_perso[int(perso_y+sin(perso_angle))][int(perso_x-cos(perso_angle))]!='#'){
+		 mat_perso[int(perso_y)][int(perso_x)]=' ';
+		 perso_x = perso_x-cos(perso_angle);
+		 perso_y = perso_y+sin(perso_angle);
+		 mat_perso[int(perso_y)][int(perso_x)]='0';
                  
-	       }
+	       } 
 	       break;
 	     }
 	   break;
@@ -110,7 +108,7 @@ void HandleEvent(SDL_Event event)
 
 
 
-void draw(SDL_Surface *screen, int perso_x, int perso_y){
+void draw(SDL_Surface *screen){
   int i,j,w,h;
   float angle_vue,dist,angle_ray,ray_x,ray_y,t;
   SDL_Rect wall,perso,tmp;
@@ -127,8 +125,8 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
       }
     }
   }
-  perso.w = PERSO_WIDTH;
-  perso.h = PERSO_WIDTH;
+  perso.w = 1;
+  perso.h = 1;
   perso.x = perso_x*PERSO_WIDTH+w;
   perso.y = perso_y*PERSO_WIDTH;
   SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
@@ -137,13 +135,13 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
   //M_PI*2 regarde a droite
   //M_PI regarde a gauche 
   //(3*M_PI)/2 regarde en haut
-  angle_vue = 3*M_PI/2;
+  angle_vue = perso_angle;
   
   for (i=0; i<w; i++) { // vue 3D
     angle_ray = angle_vue-(FOV/2)+i*(FOV/w);
     for (t=0; t<48; t+=.05) {
-      ray_x = perso_x+0.5+cos(angle_ray)*t;
-      ray_y = perso_y+0.5+sin(angle_ray)*t;
+      ray_x = perso_x+cos(angle_ray)*t;
+      ray_y = perso_y+sin(angle_ray)*t;
       
       if (mat_perso[int(ray_y)][int(ray_x)]!=' ') {
 	dist = sqrt(pow((perso_x-ray_x),2)+pow((perso_y-ray_y),2));
@@ -196,23 +194,25 @@ int main (int argc, char*args[]){
         for(j=0;j<24;j++){
             if(mat_perso[i][j]!='#'){
                 mat_perso[i][j]='0';
-		perso_x=j;
-		perso_y=i;
+		perso_x=j+0.1;
+		perso_y=i+0.1;
                 goto label;
 
             }
         }
     }
     label:
-    
-    
+
+    perso_angle = 0;
+
+    /*
      for(int i=0;i<24;i++){
         for(int j=0;j<24;j++){
             printf("%c", mat_perso[i][j]);
         }
         printf("\n");
 	}
-    
+    */
     
     while (!gameover){
         SDL_Event event;
@@ -221,8 +221,9 @@ int main (int argc, char*args[]){
         if (SDL_PollEvent(&event)) {
             HandleEvent(event);
         }
-	printf("perso_x = %d, perso_y = %d\n",perso_x,perso_y);
-        draw(screen,perso_x,perso_y);
+	printf("perso_x = %f, perso_y = %f\n",perso_x,perso_y);
+	printf("angle = %f\n",perso_angle);
+        draw(screen);
 
         // update the screen
         SDL_UpdateRect(screen, 0, 0, 0, 0);
