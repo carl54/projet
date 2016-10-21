@@ -17,9 +17,9 @@ float y = 16;
 int perso_x,perso_y; //coordonnees du personnage
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 ############\
-#  #    #  #\
+## #    #  #\
 #  #  ###  #\
-## #  #    #\
+#  #  #    #\
 #  #     ###\
 #  ##      #\
 #     ###  #\
@@ -71,35 +71,35 @@ void HandleEvent(SDL_Event event)
 	       break;
 		//tourner le perso a gauche
 	     case SDLK_LEFT:
-	       if(mat_perso[perso_x][perso_y-1]!='#'){
-		 mat_perso[perso_x][perso_y]=' ';
-		 perso_y--;
-		 mat_perso[perso_x][perso_y]='0';
+	       if(mat_perso[perso_y][perso_x-1]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_x--;
+		 mat_perso[perso_y][perso_x]='0';
                  
 	       }
 	       break;
 		//tourner le perso a droite
 	     case SDLK_RIGHT:
-	       if(mat_perso[perso_x][perso_y+1]!='#'){
-		 mat_perso[perso_x][perso_y]=' ';
-		 perso_y++;
-		 mat_perso[perso_x][perso_y]='0';
+	       if(mat_perso[perso_y][perso_x+1]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_x++;
+		 mat_perso[perso_y][perso_x]='0';
                  
 	       }
 	       break;
 	     case SDLK_UP:
-	       if(mat_perso[perso_x-1][perso_y]!='#'){
-		 mat_perso[perso_x][perso_y]=' ';
-		 perso_x--;
-		 mat_perso[perso_x][perso_y]='0';
+	       if(mat_perso[perso_y-1][perso_x]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_y--;
+		 mat_perso[perso_y][perso_x]='0';
                  
 	       } 
 	       break;
 	     case SDLK_DOWN:
-	       if(mat_perso[perso_x+1][perso_y]!='#'){
-		 mat_perso[perso_x][perso_y]=' ';
-		 perso_x++;
-		 mat_perso[perso_x][perso_y]='0';
+	       if(mat_perso[perso_y+1][perso_x]!='#'){
+		 mat_perso[perso_y][perso_x]=' ';
+		 perso_y++;
+		 mat_perso[perso_y][perso_x]='0';
                  
 	       }
 	       break;
@@ -118,44 +118,41 @@ void draw(SDL_Surface *screen, int perso_x, int perso_y){
   w = SCREEN_WIDTH/2;
   for (i=0;i<24;i++){         //vue 2D
     for (j=0;j<24;j++){
-      if (mat_perso[j][i] == '#'){
+      if (mat_perso[i][j] == '#'){
 	wall.w = WALL_WIDTH;
 	wall.h = WALL_WIDTH;
-	wall.x = i*WALL_WIDTH+w;
-	wall.y = j*WALL_WIDTH;
+	wall.x = j*WALL_WIDTH+w;
+	wall.y = i*WALL_WIDTH;
 	SDL_FillRect(screen,&wall,SDL_MapRGB(screen->format,255,0,0));
       }
     }
   }
   perso.w = PERSO_WIDTH;
   perso.h = PERSO_WIDTH;
-  perso.x = perso_y*PERSO_WIDTH+w;
-  perso.y = perso_x*PERSO_WIDTH;
+  perso.x = perso_x*PERSO_WIDTH+w;
+  perso.y = perso_y*PERSO_WIDTH;
   SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
   
-  //M_PI/2 regarde a droite
-  //M_PI*2 regarde en bas
-  //M_PI regarde en haut 
-  //(3*M_PI)/2 regarde a gauche
-  // IL FAUT AJOUTER PI/2 AUX ANGLES 'NORMAUX' CAR LE REPERE DE LA FENETRE EST ORIENTÉ VERS LE BAS EN Y ET NON VERS LE HAUT COMME ON EN A L'HABITUDE
-  angle_vue = M_PI;
+  //M_PI/2 regarde en bas
+  //M_PI*2 regarde a droite
+  //M_PI regarde a gauche 
+  //(3*M_PI)/2 regarde en haut
+  angle_vue = 3*M_PI/2;
   
   for (i=0; i<w; i++) { // vue 3D
     angle_ray = angle_vue-(FOV/2)+i*(FOV/w);
-    for (t=0; t<24; t+=.05) {
-      //perso_x+0.5-cos(angle_ray)*t si regarde gauche ou droite
-      ray_x = perso_x+cos(angle_ray)*t;
-      //perso_y+0.5-sin(angle_ray)*t si regarde haut ou bas
-      ray_y = perso_y-sin(angle_ray)*t;
+    for (t=0; t<48; t+=.05) {
+      ray_x = perso_x+0.5+cos(angle_ray)*t;
+      ray_y = perso_y+0.5+sin(angle_ray)*t;
       
-      if (mat_perso[int(ray_x)][int(ray_y)]!=' ') {
+      if (mat_perso[int(ray_y)][int(ray_x)]!=' ') {
 	dist = sqrt(pow((perso_x-ray_x),2)+pow((perso_y-ray_y),2));
 	h = 50*WALL_WIDTH/dist;
 	tmp.w = 1;
 	tmp.h = h;
 	tmp.x = i;
 	tmp.y = (SCREEN_HEIGHT-h)/2;
-	if (mat_perso[int(ray_x)][int(ray_y)]=='#'){
+	if (mat_perso[int(ray_y)][int(ray_x)]=='#'){
 	  SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
 	  break;
 	}
@@ -197,8 +194,8 @@ int main (int argc, char*args[]){
     //placement du perso dans la premiere case vide de la matrice
     for(i=0;i<24;i++){
         for(j=0;j<24;j++){
-            if(mat_perso[j][i]!='#'){
-                mat_perso[j][i]='0';
+            if(mat_perso[i][j]!='#'){
+                mat_perso[i][j]='0';
 		perso_x=j;
 		perso_y=i;
                 goto label;
@@ -208,14 +205,14 @@ int main (int argc, char*args[]){
     }
     label:
     
-    /*
+    
      for(int i=0;i<24;i++){
         for(int j=0;j<24;j++){
             printf("%c", mat_perso[i][j]);
         }
         printf("\n");
 	}
-    */
+    
     
     while (!gameover){
         SDL_Event event;
@@ -224,6 +221,7 @@ int main (int argc, char*args[]){
         if (SDL_PollEvent(&event)) {
             HandleEvent(event);
         }
+	printf("perso_x = %d, perso_y = %d\n",perso_x,perso_y);
         draw(screen,perso_x,perso_y);
 
         // update the screen
