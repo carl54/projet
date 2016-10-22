@@ -68,35 +68,35 @@ void HandleEvent(SDL_Event event)
 	       gameover = 1;
 	       break;
 		//tourner le perso a gauche
-	     case SDLK_RIGHT:
-	       if(perso_angle > 11*M_PI/6){
+	     case SDLK_LEFT:
+	       if(perso_angle > 23*M_PI/12){
 		 perso_angle = perso_angle-2*M_PI;
 	       }
-	       perso_angle=perso_angle+M_PI/6;
+	       perso_angle=perso_angle+M_PI/12;
 	       break;
 
 		//tourner le perso a droite
-	     case SDLK_LEFT:
-	       if (perso_angle < M_PI/6){
+	     case SDLK_RIGHT:
+	       if (perso_angle < M_PI/12){
 		 perso_angle = perso_angle+2*M_PI;
 	       }
-	       perso_angle = perso_angle-M_PI/6;
+	       perso_angle = perso_angle-M_PI/12;
 	       break;
 
 	     case SDLK_UP:
-	       if(mat_perso[int(perso_y-sin(perso_angle))][int(perso_x+cos(perso_angle))]!='#'){
+	       if(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)]!='#'){
 		 mat_perso[int(perso_y)][int(perso_x)]=' ';
-		 perso_x = perso_x+cos(perso_angle);
-		 perso_y = perso_y-sin(perso_angle);
+		 perso_x = perso_x+cos(perso_angle)*0.5;
+		 perso_y = perso_y-sin(perso_angle)*0.5;
 		 mat_perso[int(perso_y)][int(perso_x)]='0';
                  
 	       } 
 	       break;
 	     case SDLK_DOWN:
-	      if(mat_perso[int(perso_y+sin(perso_angle))][int(perso_x-cos(perso_angle))]!='#'){
+	      if(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)]!='#'){
 		 mat_perso[int(perso_y)][int(perso_x)]=' ';
-		 perso_x = perso_x-cos(perso_angle);
-		 perso_y = perso_y+sin(perso_angle);
+		 perso_x = perso_x-cos(perso_angle)*0.5;
+		 perso_y = perso_y+sin(perso_angle)*0.5;
 		 mat_perso[int(perso_y)][int(perso_x)]='0';
                  
 	       } 
@@ -121,7 +121,22 @@ void draw(SDL_Surface *screen){
 	wall.h = WALL_WIDTH;
 	wall.x = j*WALL_WIDTH+w;
 	wall.y = i*WALL_WIDTH;
-	SDL_FillRect(screen,&wall,SDL_MapRGB(screen->format,255,0,0));
+        if(i%2 == 0){
+	    if(j%2 == 0){
+	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 255, 0,0));
+	    }
+	    else{
+	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 0, 255,0));
+	    }
+	  }
+	  else{
+	    if(j%2 == 0){
+	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 0, 255,0));
+	    }
+	    else{
+	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 255, 0,0));
+	    }
+	  }
       }
     }
   }
@@ -135,7 +150,8 @@ void draw(SDL_Surface *screen){
   //M_PI*2 regarde a droite
   //M_PI regarde a gauche 
   //(3*M_PI)/2 regarde en haut
-  angle_vue = perso_angle;
+  //l'angle de vue est inversé par rapport a l'angle du perso car le repere est inversé en y donc les angles sont changés
+  angle_vue = -perso_angle;
   
   for (i=0; i<w; i++) { // vue 3D
     angle_ray = angle_vue-(FOV/2)+i*(FOV/w);
@@ -150,8 +166,23 @@ void draw(SDL_Surface *screen){
 	tmp.h = h;
 	tmp.x = i;
 	tmp.y = (SCREEN_HEIGHT-h)/2;
-	if (mat_perso[int(ray_y)][int(ray_x)]=='#'){
-	  SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
+	if (mat_perso[int(ray_y)][int(ray_x)] == '#'){
+	  if(int(ray_y)%2 == 0){
+	    if(int(ray_x)%2 == 0){
+	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
+	    }
+	    else{
+	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 255,0));
+	    }
+	  }
+	  else{
+	    if(int(ray_x)%2 == 0){
+	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 255,0));
+	    }
+	    else{
+	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
+	    }
+	  }
 	  break;
 	}
 	/*
@@ -221,8 +252,7 @@ int main (int argc, char*args[]){
         if (SDL_PollEvent(&event)) {
             HandleEvent(event);
         }
-	printf("perso_x = %f, perso_y = %f\n",perso_x,perso_y);
-	printf("angle = %f\n",perso_angle);
+
         draw(screen);
 
         // update the screen
