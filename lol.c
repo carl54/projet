@@ -126,12 +126,12 @@ void draw(SDL_Surface *screen){
 	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 255, 0,0));
 	    }
 	    else{
-	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 0, 255,0));
+	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 102, 69,0));
 	    }
 	  }
 	  else{
 	    if(j%2 == 0){
-	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 0, 255,0));
+	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 102, 69,0));
 	    }
 	    else{
 	      SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 255, 0,0));
@@ -140,11 +140,16 @@ void draw(SDL_Surface *screen){
       }
     }
   }
+  perso.w = 9;
+  perso.h = 9;
+  perso.x = perso_x*PERSO_WIDTH+w-4;
+  perso.y = perso_y*PERSO_WIDTH-4;
+  SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
   perso.w = 1;
   perso.h = 1;
   perso.x = perso_x*PERSO_WIDTH+w;
   perso.y = perso_y*PERSO_WIDTH;
-  SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
+  SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,255,255,10));
   
   //M_PI/2 regarde en bas
   //M_PI*2 regarde a droite
@@ -172,12 +177,12 @@ void draw(SDL_Surface *screen){
 	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
 	    }
 	    else{
-	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 255,0));
+	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 102, 69,0));
 	    }
 	  }
 	  else{
 	    if(int(ray_x)%2 == 0){
-	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 255,0));
+	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 102, 69,0));
 	    }
 	    else{
 	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
