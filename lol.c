@@ -166,6 +166,7 @@ void draw(SDL_Surface *screen){
       
       if (mat_perso[int(ray_y)][int(ray_x)]!=' ') {
 	dist = sqrt(pow((perso_x-ray_x),2)+pow((perso_y-ray_y),2));
+	dist = dist*cos(fabs(angle_vue-angle_ray));
 	h = 50*WALL_WIDTH/dist;
 	tmp.w = 1;
 	tmp.h = h;
