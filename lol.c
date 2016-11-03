@@ -106,13 +106,33 @@ void HandleEvent(SDL_Event event)
        }
 }
 
+//les parametre sont en float pour savoir a partir de quelle colonne de pixel on affiche la texture
+void drawTexture(SDL_Surface *screen, float x, float y){
+	int pix;
+	printf("%f, %f\n", x, y);
+	x = floor(x*100);
+	pix = int(x)%10;
+	printf("%d\n",pix);
+}
 
-
-void draw(SDL_Surface *screen){
+void draw(SDL_Surface *screen, SDL_Surface *sol){
   int i,j,w,h;
   float angle_vue,dist,angle_ray,ray_x,ray_y,t;
-  SDL_Rect wall,perso,tmp;
-  SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,255,255,255));
+  SDL_Rect wall,perso,tmp,half_screen;
+  half_screen.w = 200;
+  half_screen.h = 200;
+  half_screen.x=0;
+  half_screen.y = 200;
+
+  SDL_BlitSurface(sol,NULL,screen,&half_screen);
+  half_screen.x=200;
+
+  SDL_BlitSurface(sol,NULL,screen,&half_screen);
+  half_screen.w = 400;
+  half_screen.y = 0;
+  half_screen.x=0;
+
+  SDL_FillRect(screen,&half_screen,SDL_MapRGB(screen->format,143,223,232));
   w = SCREEN_WIDTH/2;
   for (i=0;i<24;i++){         //vue 2D
     for (j=0;j<24;j++){
@@ -173,6 +193,7 @@ void draw(SDL_Surface *screen){
 	tmp.x = i;
 	tmp.y = (SCREEN_HEIGHT-h)/2;
 	if (mat_perso[int(ray_y)][int(ray_x)] == '#'){
+		drawTexture(screen, ray_x, ray_y);
 	  if(int(ray_y)%2 == 0){
 	    if(int(ray_x)%2 == 0){
 	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
@@ -204,13 +225,13 @@ void draw(SDL_Surface *screen){
 
 int main (int argc, char*args[]){
     int i, j;
-    SDL_Surface *screen, *screen2;
+    SDL_Surface *screen,*sol;
     // initialize SDL
     SDL_Init(SDL_INIT_VIDEO);
 
     // create window
     screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-
+sol = SDL_LoadBMP("Grass_double.bmp");
     // set keyboard repeat
     SDL_EnableKeyRepeat(1, 100);
 
@@ -221,7 +242,7 @@ int main (int argc, char*args[]){
     for(i=0;i<24;i++){
         for(j=0;j<24;j++){
             mat_perso[i][j]=' ';
-        }
+         }
     }
 
     fillMat(map, mat_perso);
@@ -259,7 +280,7 @@ int main (int argc, char*args[]){
             HandleEvent(event);
         }
 
-        draw(screen);
+        draw(screen,sol);
 
         // update the screen
         SDL_UpdateRect(screen, 0, 0, 0, 0);
