@@ -1,7 +1,9 @@
 //g++ lol.c `sdl-config --cflags --libs` -o lol
 #include "SDL.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 400
@@ -107,12 +109,20 @@ void HandleEvent(SDL_Event event)
 }
 
 //les parametre sont en float pour savoir a partir de quelle colonne de pixel on affiche la texture
-void drawTexture(SDL_Surface *screen, float x, float y){
+void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall){
 	int pix;
-	printf("%f, %f\n", x, y);
+  SDL_Surface *murDraw;
+	SDL_Rect rect;
+
 	x = floor(x*100);
 	pix = int(x)%10;
-	printf("%d\n",pix);
+	rect.x=pix;
+	rect.y=wall.y;
+	rect.h=wall.h;
+	rect.w=wall.w;
+	
+	murDraw = SDL_LoadBMP("mur.bmp");
+  SDL_BlitSurface(murDraw, &rect, screen, &wall);
 }
 
 void draw(SDL_Surface *screen, SDL_Surface *sol){
@@ -193,7 +203,8 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
 	tmp.x = i;
 	tmp.y = (SCREEN_HEIGHT-h)/2;
 	if (mat_perso[int(ray_y)][int(ray_x)] == '#'){
-		drawTexture(screen, ray_x, ray_y);
+		drawTexture(screen, ray_x, ray_y, tmp);
+		//break;
 	  if(int(ray_y)%2 == 0){
 	    if(int(ray_x)%2 == 0){
 	      SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
