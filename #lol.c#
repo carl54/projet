@@ -202,7 +202,7 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
   //M_PI*2 regarde a droite
   //M_PI regarde a gauche 
   //(3*M_PI)/2 regarde en haut
-  //l'angle de vue est inversé par rapport a l'angle du perso car le repere est inversé en y donc les angles sont changés
+  //l'angle de vue est inversÃ© par rapport a l'angle du perso car le repere est inversÃ© en y donc les angles sont changÃ©s
   angle_vue = -perso_angle;
   
   for (i=0; i<w; i++) { // vue 3D
