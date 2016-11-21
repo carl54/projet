@@ -36,8 +36,8 @@
       <file leaf-file-name="lol.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lol.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="47">
-              <caret line="224" column="10" selection-start-line="224" selection-start-column="10" selection-end-line="224" selection-end-column="10" />
+            <state relative-caret-position="515">
+              <caret line="217" column="18" selection-start-line="217" selection-start-column="18" selection-end-line="217" selection-end-column="18" />
               <folding />
             </state>
           </provider>
@@ -301,7 +301,7 @@
       <workItem from="1479651994138" duration="2623000" />
       <workItem from="1479673135071" duration="857000" />
       <workItem from="1479674417500" duration="4965000" />
-      <workItem from="1479722640838" duration="600000" />
+      <workItem from="1479722640838" duration="717000" />
     </task>
     <task id="LOCAL-00001" summary="textures leviers et portes">
       <created>1479723187880</created>
@@ -310,11 +310,18 @@
       <option name="project" value="LOCAL" />
       <updated>1479723187881</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="textures leviers et portes">
+      <created>1479723244526</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1479723244526</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="21431000" />
+    <option name="totallyTimeSpent" value="21548000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1969" y="24" width="1871" height="1056" extended-state="6" />
@@ -322,9 +329,9 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.090326026" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32925585" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.494388" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24770643" sideWeight="0.49812934" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17023446" sideWeight="0.5072154" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.50561196" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17023446" sideWeight="0.49278462" order="7" side_tool="false" content_ui="tabs" />
@@ -520,8 +527,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lol.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="47">
-          <caret line="224" column="10" selection-start-line="224" selection-start-column="10" selection-end-line="224" selection-end-column="10" />
+        <state relative-caret-position="515">
+          <caret line="217" column="18" selection-start-line="217" selection-start-column="18" selection-end-line="217" selection-end-column="18" />
           <folding />
         </state>
       </provider>
