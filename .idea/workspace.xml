@@ -12,11 +12,8 @@
     </ADDITIONAL_GENERATION_ENVIRONMENT>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="00f22e4c-73ad-4916-8319-8e7be50dd96e" name="Default" comment="textures leviers et portes">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lol" afterPath="$PROJECT_DIR$/lol" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/walltext.bmp" afterPath="$PROJECT_DIR$/walltext.bmp" />
+    <list default="true" id="00f22e4c-73ad-4916-8319-8e7be50dd96e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lol.c" afterPath="$PROJECT_DIR$/lol.c" />
     </list>
     <ignored path="projet.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -304,12 +301,20 @@
       <workItem from="1479651994138" duration="2623000" />
       <workItem from="1479673135071" duration="857000" />
       <workItem from="1479674417500" duration="4965000" />
-      <workItem from="1479722640838" duration="542000" />
+      <workItem from="1479722640838" duration="600000" />
     </task>
+    <task id="LOCAL-00001" summary="textures leviers et portes">
+      <created>1479723187880</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1479723187881</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="21373000" />
+    <option name="totallyTimeSpent" value="21431000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1969" y="24" width="1871" height="1056" extended-state="6" />
