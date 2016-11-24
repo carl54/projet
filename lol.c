@@ -15,23 +15,24 @@
 /*
  * elements classes dans l'ordre ascii
  * ` = mur
- * agm = levier monte, baisse, porte violet
- * bhn = levier monte, baisse, porte orange
- * cio = levier monte, baisse, porte blanc
- * djp = levier monte, baisse, porte vert
- * ekq = levier monte, baisse, porte marron
- * flr = levier monte, baisse, porte noir
+ * agms = levier monte, baisse, porte violet fermee, ouvert
+ * bhnt = levier monte, baisse, porte orange fermee, ouvert
+ * ciou = levier monte, baisse, porte blanc fermee, ouvert
+ * djpv = levier monte, baisse, porte vert fermee, ouvert
+ * ekqw = levier monte, baisse, porte marron fermee, ouvert
+ * flrx = levier monte, baisse, porte noir fermee, ouvert
  */
 int gameover, visionLevier, typeL;
+int avancer, tourner;
 float perso_angle,perso_x,perso_y;
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 ``````f`r```````````````\
 `         `    `       `\
 `         e  ```       `\
 `         `  `         `\
-`         q  ``        `\
+`   0     `  ``        `\
 `         ``           `\
-`              ```     `\
+`         q    ```     `\
 `         ``   `       `\
 c          d   `       `\
 `          `   ```     `\
@@ -79,19 +80,24 @@ int isPorte(char c){
   if(c>='m' && c<='r') return 1;
   return 0;
 }
+int isOpenDoor(char c){
+  if(c>='s' && c<='x') return 1;
+  return 0;
+}
 
 void openDoor(char c){
   
-    for(int i=0;i<24;i++){
-      for(int j=0;j<24;j++){
-        if(mat_perso[i][j]==c+6){
-          mat_perso[i][j]='#';
-          goto label1;
-        }
+  for(int i=0;i<24;i++){
+    for(int j=0;j<24;j++){
+      if(mat_perso[i][j]==c+6){
+        mat_perso[i][j]=c+12;
+        printf("%c\n", c+12);
+        goto label1;
       }
     }
+  }
   
-    label1:;
+  label1:;
   
   
 }
@@ -99,8 +105,9 @@ void openDoor(char c){
 void closeDoor(char c ){
   for(int i=0;i<24;i++){
     for(int j=0;j<24;j++){
-      if(mat_perso[i][j]=='#'){
+      if(mat_perso[i][j]==c+18){
         mat_perso[i][j]=c+12;
+        printf("%c\n", mat_perso[i][j]);
         goto label2;
       }
     }
@@ -125,43 +132,25 @@ void HandleEvent(SDL_Event event){
         case SDLK_q:
           gameover = 1;
           break;
+          
           //tourner le perso a gauche
         case SDLK_LEFT:
-          if(perso_angle > 23*M_PI/12){
-            perso_angle = perso_angle-2*M_PI;
-          }
-          perso_angle=perso_angle+M_PI/12;
+          tourner=-1;
           break;
           
           //tourner le perso a droite
         case SDLK_RIGHT:
-          if (perso_angle < M_PI/12){
-            perso_angle = perso_angle+2*M_PI;
-          }
-          perso_angle = perso_angle-M_PI/12;
+          tourner = 1;
           break;
         
         case SDLK_UP:
-          if(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)]!='`' && !isLevier(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)])
-          && !isPorte(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)])){
-            mat_perso[int(perso_y)][int(perso_x)]=' ';
-            perso_x = perso_x+cos(perso_angle)*0.25;
-            perso_y = perso_y-sin(perso_angle)*0.25;
-            mat_perso[int(perso_y)][int(perso_x)]='0';
-            
-          }
+          avancer=1;
           break;
+        
         case SDLK_DOWN:
-          if(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)]!='`'
-                  && !isLevier(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)])
-                  && !isPorte(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)])){
-            mat_perso[int(perso_y)][int(perso_x)]=' ';
-            perso_x = perso_x-cos(perso_angle)*0.1;
-            perso_y = perso_y+sin(perso_angle)*0.1;
-            mat_perso[int(perso_y)][int(perso_x)]='0';
-          }
+          avancer=-1;
           break;
-          
+        
         case SDLK_SPACE:
           if(visionLevier && (isLevier(mat_perso[int(perso_y+1)][int(perso_x)]) || isLevier(mat_perso[int(perso_y)][int(perso_x+1)])
                               ||isLevier(mat_perso[int(perso_y-1)][int(perso_x)]) || isLevier(mat_perso[int(perso_y)][int(perso_x-1)]))){
@@ -188,13 +177,73 @@ void HandleEvent(SDL_Event event){
           }
       }
       break;
+    case SDL_KEYUP:
+      switch (event.key.keysym.sym)
+      {
+        case SDLK_LEFT:
+          tourner=0;
+          break;
+          
+          //tourner le perso a droite
+        case SDLK_RIGHT:
+          tourner = 0;
+          break;
+        
+        case SDLK_UP:
+          avancer=0;
+          break;
+        
+        case SDLK_DOWN:
+          avancer=0;
+          break;
+      }
   }
 }
 
 float max(float a, float b) {
   return a<b ? b : a;
 }
-
+void deplacer(int avancer, int reculer){
+  switch (avancer){
+    case 1:
+      if(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)]!='`' && !isLevier(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)])
+         && !isPorte(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)])){
+        mat_perso[int(perso_y)][int(perso_x)]=' ';
+        perso_x = perso_x+cos(perso_angle)*0.05;
+        perso_y = perso_y-sin(perso_angle)*0.05;
+        mat_perso[int(perso_y)][int(perso_x)]='0';
+        
+      }
+      break;
+    
+    case -1:
+      if(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)]!='`'
+         && !isLevier(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)])
+         && !isPorte(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)])){
+        mat_perso[int(perso_y)][int(perso_x)]=' ';
+        perso_x = perso_x-cos(perso_angle)*0.05;
+        perso_y = perso_y+sin(perso_angle)*0.05;
+        mat_perso[int(perso_y)][int(perso_x)]='0';
+      }
+      break;
+  }
+  
+  switch (tourner){
+    case 1:
+      if (perso_angle < M_PI/12){
+        perso_angle = perso_angle+2*M_PI;
+      }
+      perso_angle = perso_angle-M_PI/100;
+      break;
+    
+    case -1:
+      if(perso_angle > 23*M_PI/12){
+        perso_angle = perso_angle-2*M_PI;
+      }
+      perso_angle=perso_angle+M_PI/100;
+      break;
+  }
+}
 //les parametre sont en float pour savoir a partir de quelle colonne de pixel on affiche la texture
 void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numText){
   int tx = max(fabs(x-floor(x+.5)), fabs(y-floor(y+.5)))*murDraw->h; // x-texcoord
@@ -275,7 +324,7 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
       ray_x = perso_x+cos(angle_ray)*t;
       ray_y = perso_y+sin(angle_ray)*t;
       
-      if (mat_perso[int(ray_y)][int(ray_x)]!=' ' || mat_perso[int(ray_y)][int(ray_x)]!='#') {
+      if (mat_perso[int(ray_y)][int(ray_x)]!=' ' || !isOpenDoor(mat_perso[int(ray_y)][int(ray_x)])) {
         dist = t;//sqrt(pow((perso_x-ray_x),2)+pow((perso_y-ray_y),2));
         dist = dist*cos(fabs(angle_vue-angle_ray));
         h = 50*WALL_WIDTH/dist;
@@ -283,40 +332,15 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
         tmp.h = h;
         tmp.x = i;
         tmp.y = (SCREEN_HEIGHT-h)/2;
-          
         
         if (mat_perso[int(ray_y)][int(ray_x)] >= '`' && mat_perso[int(ray_y)][int(ray_x)] <= 'r') {
           drawTexture(screen, ray_x, ray_y, tmp, (mat_perso[int(ray_y)][int(ray_x)]-'`'));
           visionLevier=1;
           //if(visionLevier) printf("%d\n", visionLevier);
           break;
-          if(int(ray_y)%2 == 0){
-            if(int(ray_x)%2 == 0){
-              SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
-            }
-            else{
-              SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 102, 69,0));
-            }
-          }
-          else{
-            if(int(ray_x)%2 == 0){
-              SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 102, 69,0));
-            }
-            else{
-              SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 255, 0,0));
-            }
-          }
-          break;
         }
-        /*
-          if (mat_perso[int(ray_x)][int(ray_y)]=='0') {
-          SDL_FillRect(screen, &tmp, SDL_MapRGB(screen->format, 0, 0,0));
-          }
-          break;
-        */
       }else visionLevier=0;
     }
-    //    break;
   }
 }
 
@@ -377,7 +401,7 @@ int main (int argc, char*args[]){
     if (SDL_PollEvent(&event)) {
       HandleEvent(event);
     }
-    
+    deplacer(avancer, tourner);
     draw(screen,sol);
     
     // update the screen
