@@ -358,7 +358,7 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
     }
   }
 }
-
+ 
 int main (int argc, char*args[]){
   int i, j;
   SDL_Surface *screen,*sol;
