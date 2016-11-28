@@ -258,6 +258,7 @@ void drawSol(SDL_Surface *screen, float x, float y, SDL_Rect sol, int numText, f
   int pixDist, tx, ty;
   double posSolX, posSolY, weight;
   for (int i=sol.y; i < screen->h; i++) {
+    
   }
 }
 

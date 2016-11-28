@@ -13,8 +13,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="00f22e4c-73ad-4916-8319-8e7be50dd96e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lol" afterPath="$PROJECT_DIR$/lol" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lol.c" afterPath="$PROJECT_DIR$/lol.c" />
     </list>
     <ignored path="projet.iws" />
@@ -38,8 +36,8 @@
       <file leaf-file-name="lol.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lol.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1231">
-              <caret line="258" column="34" lean-forward="true" selection-start-line="258" selection-start-column="0" selection-end-line="259" selection-end-column="0" />
+            <state relative-caret-position="414">
+              <caret line="248" column="82" lean-forward="true" selection-start-line="248" selection-start-column="82" selection-end-line="248" selection-end-column="82" />
               <folding />
             </state>
           </provider>
@@ -307,7 +305,7 @@
       <workItem from="1479996945911" duration="7655000" />
       <workItem from="1480012591751" duration="11246000" />
       <workItem from="1480260812650" duration="4055000" />
-      <workItem from="1480318122285" duration="568000" />
+      <workItem from="1480318122285" duration="769000" />
     </task>
     <task id="LOCAL-00001" summary="textures leviers et portes">
       <created>1479723187880</created>
@@ -344,15 +342,29 @@
       <option name="project" value="LOCAL" />
       <updated>1480002219385</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="deplacements">
+      <created>1480318713360</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1480318713360</updated>
+    </task>
+    <task id="LOCAL-00007" summary="deplacements">
+      <created>1480318767049</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1480318767049</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54825000" />
+    <option name="totallyTimeSpent" value="55026000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="49" y="24" width="1871" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.090326026" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -360,7 +372,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.50561196" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16921508" sideWeight="0.49278462" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16921508" sideWeight="0.49278462" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925585" sideWeight="0.494388" order="7" side_tool="false" content_ui="tabs" />
@@ -615,8 +627,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lol.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1231">
-          <caret line="258" column="34" lean-forward="true" selection-start-line="258" selection-start-column="0" selection-end-line="259" selection-end-column="0" />
+        <state relative-caret-position="414">
+          <caret line="248" column="82" lean-forward="true" selection-start-line="248" selection-start-column="82" selection-end-line="248" selection-end-column="82" />
           <folding />
         </state>
       </provider>
