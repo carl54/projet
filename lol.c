@@ -39,7 +39,7 @@ c          d   `       `\
 o          p           `\
 `a`m`b`n````````````````";
 char mat_perso[24][24], dir;
-SDL_Surface *murDraw;
+SDL_Surface *murDraw,*sol;
 
 Uint32 getpixel(int x, int y, int numText) {
   int texw = murDraw->w;
@@ -47,6 +47,15 @@ Uint32 getpixel(int x, int y, int numText) {
   if (x<0 || y<0 || x>=texw || y>=texh) return 0;
   //printf("%d\n", x+texh * numText);
   Uint8 *p = (Uint8 *) murDraw->pixels + y * murDraw->pitch + (x+texh*numText) * murDraw->format->BytesPerPixel;
+  return p[0] | p[1] << 8 | p[2] << 16;
+}
+
+Uint32 getpixel2(int x, int y) {
+  int texw = sol->w;
+  int texh = sol->h-1;
+  if (x<0 || y<0 || x>=texw || y>=texh) return 0;
+  //printf("%d\n", x+texh * numText);
+  Uint8 *p = (Uint8 *) murDraw->pixels + y * murDraw->pitch + (x+texh) * murDraw->format->BytesPerPixel;
   return p[0] | p[1] << 8 | p[2] << 16;
 }
 
@@ -254,11 +263,21 @@ void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numTe
   }
 }
 
-void drawSol(SDL_Surface *screen, float x, float y, SDL_Rect sol, int numText, float dist){
-  int pixDist, tx, ty;
-  double posSolX, posSolY, weight;
+void drawSol(SDL_Surface *screen, SDL_Rect sol, int numText, float wallDist){
+  int tx, ty;
+  float distance, posSolX, posSolY, weight;
   for (int i=sol.y; i < screen->h; i++) {
-    
+    distance= sol.h / (2.0*i-sol.h); //distance du pixel par rapport à la base du mur
+    weight=distance/wallDist;
+    //printf("%f\n", weight);
+    posSolX=weight*int(sol.x);
+    //printf("%f\n", posSolX);
+    posSolY=weight*(int(sol.y))+(1.0-weight)*perso_x;
+    printf("%f\n", posSolY);
+    ty=int(posSolY*murDraw->h)%murDraw->h;
+    //printf("%d\n",ty);
+    tx=int(posSolX*murDraw->h)%murDraw->h;
+    putpixel(screen, sol.x, i, getpixel(tx, ty,1));
   }
 }
 
@@ -346,9 +365,9 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
           drawTexture(screen, ray_x, ray_y, tmp, (mat_perso[int(ray_y)][int(ray_x)]-'`'));
           visionLevier=1;
           tmp.h=(screen->h-tmp.h)/2;
-          printf("h=%d\n", tmp.h);
+          //printf("h=%d\n", tmp.h);
           tmp.y=h+tmp.h;
-          drawSol(screen, ray_x, ray_y, tmp, 0, dist);
+          drawSol(screen, tmp, 0, dist);
           //if(visionLevier) printf("%d\n", visionLevier);
           break;
         }
