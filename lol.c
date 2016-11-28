@@ -30,15 +30,15 @@ char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 `         `    `       `\
 `         e  ```       `\
 `         `  `         `\
-`   0     `  ``        `\
+`   1     `  ``        `\
 `         ``           `\
-`         q    ```     `\
+`    1    q    ```     `\
 `         ``   `       `\
 c          d   `       `\
 `          `   ```     `\
 o          p           `\
 `a`m`b`n````````````````";
-char mat_perso[24][24];
+char mat_perso[24][24], dir;
 SDL_Surface *murDraw;
 
 Uint32 getpixel(int x, int y, int numText) {
@@ -254,11 +254,18 @@ void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numTe
   }
 }
 
+void drawSol(SDL_Surface *screen, float x, float y, SDL_Rect sol, int numText, float dist){
+  int pixDist, tx, ty;
+  double posSolX, posSolY, weight;
+  for (int i=sol.y; i < screen->h; i++) {
+  }
+}
+
 
 void draw(SDL_Surface *screen, SDL_Surface *sol){
-  int i,j,w,h;
+  int i,j,w,h,taille;
   float angle_vue,dist,angle_ray,ray_x,ray_y,t;
-  SDL_Rect wall,perso,tmp,half_screen;
+  SDL_Rect wall,perso,tmp,half_screen, lol;
   half_screen.w = 200;
   half_screen.h = 200;
   half_screen.x=0;
@@ -320,6 +327,7 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
   
   for (i=0; i<w; i++) { // vue 3D
     angle_ray = angle_vue-(FOV/2)+i*(FOV/w);
+    taille=0;
     for (t=0; t<48; t+=.05) {
       ray_x = perso_x+cos(angle_ray)*t;
       ray_y = perso_y+sin(angle_ray)*t;
@@ -336,10 +344,17 @@ void draw(SDL_Surface *screen, SDL_Surface *sol){
         if (mat_perso[int(ray_y)][int(ray_x)] >= '`' && mat_perso[int(ray_y)][int(ray_x)] <= 'r') {
           drawTexture(screen, ray_x, ray_y, tmp, (mat_perso[int(ray_y)][int(ray_x)]-'`'));
           visionLevier=1;
+          tmp.h=(screen->h-tmp.h)/2;
+          printf("h=%d\n", tmp.h);
+          tmp.y=h+tmp.h;
+          drawSol(screen, ray_x, ray_y, tmp, 0, dist);
           //if(visionLevier) printf("%d\n", visionLevier);
           break;
         }
-      }else visionLevier=0;
+      }else{
+  
+        visionLevier=0;
+      }
     }
   }
 }
