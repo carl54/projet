@@ -277,7 +277,7 @@ void draw(SDL_Surface *screen, int k) {
           break;
         }
         if(mat_perso[int(ray_y)][int(ray_x)] == '#'){
-          SDL_FillRect(screen,&tmp,SDL_MapRGB(screen->format,0,255,0));
+	  SDL_FillRect(screen,&tmp,SDL_MapRGB(screen->format,0,255,0));
           tmp.h=(screen->h-tmp.h)/2;
           tmp.y=h+tmp.h;
           break;
@@ -398,7 +398,7 @@ void HandleEvent(SDL_Event event){
 
 void deplacer(int avancer, int reculer) {
   switch (avancer) {
-    case 1:
+  case 1:
       if (mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
               perso_x + cos(perso_angle) * 0.5)] != '`' && !isLevier(
               mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
@@ -412,14 +412,14 @@ void deplacer(int avancer, int reculer) {
         
       }
       break;
-    
-    case -1:
+      
+  case -1:
       if (mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
-              perso_x - cos(perso_angle) * 0.5)] != '`'
+		     perso_x - cos(perso_angle) * 0.5)] != '`'
           && !isLevier(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
-              perso_x - cos(perso_angle) * 0.5)])
+			   perso_x - cos(perso_angle) * 0.5)])
           && !isPorte(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
-              perso_x - cos(perso_angle) * 0.5)])) {
+			perso_x - cos(perso_angle) * 0.5)])) {
         mat_perso[int(perso_y)][int(perso_x)] = ' ';
         perso_x = perso_x - cos(perso_angle) * 0.05;
         perso_y = perso_y + sin(perso_angle) * 0.05;
@@ -428,15 +428,35 @@ void deplacer(int avancer, int reculer) {
       break;
   }
   switch (lateral) {
-    case 1:
-      perso_x = perso_x;
-      //deplacer droite
-      break;
+  case 1:
+    if (mat_perso[int(perso_y - sin(perso_angle-M_PI/2) * 0.5)][int(
+		     perso_x + cos(perso_angle-M_PI/2) * 0.5)] != '`'
+	&& !isLevier(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
+			   perso_x + cos(perso_angle-M_PI/2) * 0.5)])
+	&& !isPorte(mat_perso[int(perso_y - sin(perso_angle-M_PI/2) * 0.5)][int(
+			perso_x + cos(perso_angle-M_PI/2) * 0.5)])) {
+      mat_perso[int(perso_y)][int(perso_x)] = ' ';
+      perso_x = perso_x+cos(perso_angle-M_PI/2)*0.05;
+      perso_y = perso_y-sin(perso_angle-M_PI/2)*0.05;
+      mat_perso[int(perso_y)][int(perso_x)] = '0';
+    }
+    //deplacer droite
+    break;
     
-    case -1:
-      perso_x = perso_x;
-      //deplacer gauche
-      break;
+  case -1:
+    if (mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
+		     perso_x + cos(perso_angle+M_PI/2) * 0.5)] != '`'
+	&& !isLevier(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
+			   perso_x + cos(perso_angle+M_PI/2) * 0.5)])
+	&& !isPorte(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
+			perso_x + cos(perso_angle+M_PI/2) * 0.5)])) {
+      mat_perso[int(perso_y)][int(perso_x)] = ' ';
+      perso_x = perso_x+cos(perso_angle+M_PI/2)*0.05;
+      perso_y = perso_y-sin(perso_angle+M_PI/2)*0.05;
+      mat_perso[int(perso_y)][int(perso_x)] = '0';
+    }
+    //deplacer gauche
+    break;
   }
   
   
@@ -479,7 +499,6 @@ void move_monster(){
     }else{
       monster.angle = monster.angle-tmp_angle;
     }
-    printf("%d\n",monster.dir);
   }
   tmp_x = monster.x+cos(monster.angle)*0.05;
   tmp_y = monster.y-sin(monster.angle)*0.05;
