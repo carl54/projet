@@ -15,10 +15,10 @@
 #define FOV M_PI/3
 
 typedef struct {
-  float x;
-  float y;
-  float angle;
-  int dir;
+    float x;
+    float y;
+    float angle;
+    int dir;
 } monstre;
 
 monstre monster;
@@ -50,7 +50,7 @@ c          d   `       `\
 o          p           `\
 `a`m`b`n````````````````";
 char mat_perso[24][24], dir;
-SDL_Surface *murDraw, *screen, *pistolet;
+SDL_Surface *murDraw, *screen=SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0), *pistolet;
 SDL_Rect posPistolet, rectPistolet;
 
 Uint32 getpixel(int x, int y, int numText) {
@@ -153,7 +153,7 @@ void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numTe
   }
 }
 
-/*void drawSol(SDL_Surface *screen, SDL_Rect sol, int numText, float wallDist){
+void drawSol(SDL_Surface *screen, SDL_Rect sol, int numText, float wallDist){
   int tx, ty;
   float distance, posSolX, posSolY, weight;
   for (int i=sol.y; i < screen->h; i++) {
@@ -164,12 +164,14 @@ void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numTe
     //printf("%f\n", posSolX);
     posSolY=weight*(int(sol.y))+(1.0-weight)*perso_x;
     printf("%f\n", posSolY);
+    // printf("%f\n", posSolY);
     ty=int(posSolY*murDraw->h)%murDraw->h;
     //printf("%d\n",ty);
     tx=int(posSolX*murDraw->h)%murDraw->h;
     putpixel(screen, sol.x, i, getpixel(tx, ty,1));
+    putpixel(screen, sol.x, i, getpixel(tx, ty,0));
   }
-}*/
+}
 
 void draw(SDL_Surface *screen, int k) {
   int i, j, w, h, taille;
@@ -179,7 +181,6 @@ void draw(SDL_Surface *screen, int k) {
   half_screen.h = SCREEN_HEIGHT;
   half_screen.x = 0;
   half_screen.y = 0;
-  
   SDL_FillRect(screen, &half_screen, SDL_MapRGB(screen->format, 65, 69, 76));
   half_screen.x = SCREEN_WIDTH/4;
   
@@ -213,6 +214,7 @@ void draw(SDL_Surface *screen, int k) {
       }
     }
   }
+  
   perso.w = 9;
   perso.h = 9;
   perso.x = perso_x*PERSO_WIDTH+w-4;
@@ -261,9 +263,9 @@ void draw(SDL_Surface *screen, int k) {
         
         if (mat_perso[int(ray_y)][int(ray_x)] >= '`' &&
             mat_perso[int(ray_y)][int(ray_x)] <= 'r') {
-          if(k==2 && i==w/2){
+          /*if(k==1 && i==w/2){
             printf("touché : %c\n", mat_perso[int(ray_y)][int(ray_x)]);
-          }
+          }*/
           drawTexture(screen, ray_x, ray_y, tmp,
                       (mat_perso[int(ray_y)][int(ray_x)] - '`'));
           visionLevier = 1;
@@ -277,9 +279,7 @@ void draw(SDL_Surface *screen, int k) {
         if(mat_perso[int(ray_y)][int(ray_x)] == '#'){
           SDL_FillRect(screen,&tmp,SDL_MapRGB(screen->format,0,255,0));
           tmp.h=(screen->h-tmp.h)/2;
-          //printf("h=%d\n", tmp.h);
           tmp.y=h+tmp.h;
-          drawSol(screen, tmp, 0, dist);
           break;
         }
       } else {
@@ -373,7 +373,7 @@ void HandleEvent(SDL_Event event){
         case SDLK_DOWN:
           avancer=0;
           break;
-  
+        
         case SDLK_SPACE: tir=0;
       }
   }
@@ -418,7 +418,7 @@ void deplacer(int avancer, int reculer){
       }
       perso_angle=perso_angle+M_PI/100;
       break;
-      
+    
   }
   if (tir){
     for (int i = 0 ; i < 45 ; i++) {
@@ -427,7 +427,7 @@ void deplacer(int avancer, int reculer){
     }
   }
 }
-}
+
 
 void move_monster(){
   float tmp_x,tmp_y,tmp_angle;
@@ -456,37 +456,20 @@ void move_monster(){
   }
 }
 //les parametre sont en float pour savoir a partir de quelle colonne de pixel on affiche la texture
-void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numText){
+/*void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numText){
   int tx = max(fabs(x-floor(x+.5)), fabs(y-floor(y+.5)))*murDraw->h; // x-texcoord
   for (int i=0; i<wall.h; i++) {
     int ty = float(i)/float(wall.h)*murDraw->h;
     Uint32 color = getpixel(tx, ty, numText);
     putpixel(screen, wall.x, wall.y+i, color);
   }
-}
-
-void drawSol(SDL_Surface *screen, SDL_Rect sol, int numText, float wallDist){
-  int tx, ty;
-  float distance, posSolX, posSolY, weight;
-  for (int i=sol.y; i < screen->h; i++) {
-    distance= sol.h / (2.0*i-sol.h); //distance du pixel par rapport à la base du mur
-    weight=distance/wallDist;
-    //printf("%f\n", weight);
-    posSolX=weight*int(sol.x);
-    //printf("%f\n", posSolX);
-    posSolY=weight*(int(sol.y))+(1.0-weight)*perso_x;
-    // printf("%f\n", posSolY);
-    ty=int(posSolY*murDraw->h)%murDraw->h;
-    //printf("%d\n",ty);
-    tx=int(posSolX*murDraw->h)%murDraw->h;
-    putpixel(screen, sol.x, i, getpixel(tx, ty,0));
-  }
+}*/
 
 
-}
 
 
-void draw(SDL_Surface *screen){
+
+/*void draw(SDL_Surface *screen){
   int i,j,w,h,taille;
   float angle_vue,dist,angle_ray,ray_x,ray_y,t;
   SDL_Rect wall,perso,tmp,half_screen, lol;
@@ -587,19 +570,19 @@ void draw(SDL_Surface *screen){
           //if(visionLevier) printf("%d\n", visionLevier);
           break;
         }
-	
+        
       }else{
-  
+        
         visionLevier=0;
       }
     }
   }
-}
- 
+}*/
+
 int main (int argc, char*args[]){
   int i, j, k=0;
   SDL_Rect positionPistolet;
-  SDL_Surface *screen;
+  //SDL_Surface *screen;
   // initialize SDL
   SDL_Init(SDL_INIT_VIDEO);
   pistolet=SDL_LoadBMP("pistolet.bmp");
@@ -607,7 +590,7 @@ int main (int argc, char*args[]){
   positionPistolet.y=0;
   SDL_SetColorKey(pistolet, SDL_SRCCOLORKEY, SDL_MapRGB(pistolet->format, 0, 255, 255));
   // create window
-  screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
+  //screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
   // set keyboard repeat
   SDL_EnableKeyRepeat(1, 100);
   
@@ -640,7 +623,7 @@ int main (int argc, char*args[]){
   label:
   
   perso_angle = 0;
-
+  
   do {
     monster.x = rand()%MAP_HEIGHT;
     monster.y = rand()%MAP_WIDTH;
