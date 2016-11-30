@@ -34,7 +34,7 @@ monstre monster;
  * flrx = levier monte, baisse, porte noir fermee, ouvert
  */
 int gameover, visionLevier, typeL;
-int avancer, tourner, tir;
+int avancer, lateral, tourner, tir;
 float perso_angle,perso_x,perso_y;
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 ``````f`r```````````````\
@@ -304,7 +304,6 @@ void HandleEvent(SDL_Event event){
       switch (event.key.keysym.sym)
       {
         case SDLK_ESCAPE:
-        case SDLK_q:
           gameover = 1;
           break;
           
@@ -318,12 +317,20 @@ void HandleEvent(SDL_Event event){
           tourner = 1;
           break;
         
-        case SDLK_UP:
+        case SDLK_z:
           avancer=1;
           break;
         
-        case SDLK_DOWN:
+        case SDLK_s:
           avancer=-1;
+          break;
+        
+        case SDLK_d:
+          lateral=1;
+          break;
+        
+        case SDLK_q:
+          lateral=-1;
           break;
         
         case SDLK_SPACE:
@@ -352,6 +359,7 @@ void HandleEvent(SDL_Event event){
           }else{
             tir=1;
           }
+          break;
       }
       break;
     case SDL_KEYUP:
@@ -360,49 +368,79 @@ void HandleEvent(SDL_Event event){
         case SDLK_LEFT:
           tourner=0;
           break;
-          
-          //tourner le perso a droite
+        
         case SDLK_RIGHT:
           tourner = 0;
           break;
         
-        case SDLK_UP:
+        case SDLK_z:
           avancer=0;
           break;
         
-        case SDLK_DOWN:
+        case SDLK_s:
           avancer=0;
           break;
         
-        case SDLK_SPACE: tir=0;
+        case SDLK_d:
+          lateral=0;
+          break;
+        
+        case SDLK_q:
+          lateral=0;
+          break;
+        
+        case SDLK_SPACE:
+          tir=0;
+          break;
       }
   }
 }
 
-void deplacer(int avancer, int reculer){
-  switch (avancer){
+void deplacer(int avancer, int reculer) {
+  switch (avancer) {
     case 1:
-      if(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)]!='`' && !isLevier(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)])
-         && !isPorte(mat_perso[int(perso_y-sin(perso_angle)*0.5)][int(perso_x+cos(perso_angle)*0.5)])){
-        mat_perso[int(perso_y)][int(perso_x)]=' ';
-        perso_x = perso_x+cos(perso_angle)*0.05;
-        perso_y = perso_y-sin(perso_angle)*0.05;
-        mat_perso[int(perso_y)][int(perso_x)]='0';
+      if (mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
+              perso_x + cos(perso_angle) * 0.5)] != '`' && !isLevier(
+              mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
+                      perso_x + cos(perso_angle) * 0.5)])
+          && !isPorte(mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
+              perso_x + cos(perso_angle) * 0.5)])) {
+        mat_perso[int(perso_y)][int(perso_x)] = ' ';
+        perso_x = perso_x + cos(perso_angle) * 0.05;
+        perso_y = perso_y - sin(perso_angle) * 0.05;
+        mat_perso[int(perso_y)][int(perso_x)] = '0';
         
       }
       break;
     
     case -1:
-      if(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)]!='`'
-         && !isLevier(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)])
-         && !isPorte(mat_perso[int(perso_y+sin(perso_angle)*0.5)][int(perso_x-cos(perso_angle)*0.5)])){
-        mat_perso[int(perso_y)][int(perso_x)]=' ';
-        perso_x = perso_x-cos(perso_angle)*0.05;
-        perso_y = perso_y+sin(perso_angle)*0.05;
-        mat_perso[int(perso_y)][int(perso_x)]='0';
+      if (mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
+              perso_x - cos(perso_angle) * 0.5)] != '`'
+          && !isLevier(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
+              perso_x - cos(perso_angle) * 0.5)])
+          && !isPorte(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
+              perso_x - cos(perso_angle) * 0.5)])) {
+        mat_perso[int(perso_y)][int(perso_x)] = ' ';
+        perso_x = perso_x - cos(perso_angle) * 0.05;
+        perso_y = perso_y + sin(perso_angle) * 0.05;
+        mat_perso[int(perso_y)][int(perso_x)] = '0';
       }
       break;
   }
+  switch (lateral) {
+    case 1:
+      perso_x = perso_x;
+      //deplacer droite
+      break;
+    
+    case -1:
+      perso_x = perso_x;
+      //deplacer gauche
+      break;
+  }
+  
+  
+  
   
   switch (tourner){
     case 1:
@@ -420,12 +458,12 @@ void deplacer(int avancer, int reculer){
       break;
     
   }
-  if (tir){
-    for (int i = 0 ; i < 45 ; i++) {
-      draw(screen, i/15);
-      SDL_UpdateRect(screen, 0, 0, 0, 0);
-    }
+/*if (tir){
+  for (int i = 0 ; i < 45 ; i++) {
+    draw(screen, i/15);
+    SDL_UpdateRect(screen, 0, 0, 0, 0);
   }
+}*/
 }
 
 
@@ -464,10 +502,6 @@ void move_monster(){
     putpixel(screen, wall.x, wall.y+i, color);
   }
 }*/
-
-
-
-
 
 /*void draw(SDL_Surface *screen){
   int i,j,w,h,taille;
@@ -580,7 +614,7 @@ void move_monster(){
 }*/
 
 int main (int argc, char*args[]){
-  int i, j, k=0;
+  int i, j;
   SDL_Rect positionPistolet;
   //SDL_Surface *screen;
   // initialize SDL
@@ -644,16 +678,32 @@ int main (int argc, char*args[]){
     
     SDL_Event event;
     
-    // look for an event
-    if (SDL_PollEvent(&event)) {
-      HandleEvent(event);
+    
+    if(tir){
+      
+      for(int k = 0 ; k<45 ; k++){
+        // look for an event
+        if (SDL_PollEvent(&event)) {
+          HandleEvent(event);
+        }
+        deplacer(avancer, tourner);
+        move_monster();
+        draw(screen, k/15);
+        SDL_UpdateRect(screen, 0, 0, 0, 0);
+      }
+    }else{
+      // look for an event
+      if (SDL_PollEvent(&event)) {
+        HandleEvent(event);
+      }
+      deplacer(avancer, tourner);
+      move_monster();
+      draw(screen, 0);
+      SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
-    deplacer(avancer, tourner);
-    move_monster();
-    draw(screen, 0);
     
     // update the screen
-    SDL_UpdateRect(screen, 0, 0, 0, 0);
+    
   }
   SDL_FreeSurface(screen);
   SDL_Quit();
