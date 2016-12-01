@@ -6,6 +6,7 @@
 #include <string.h>
 #include <time.h>
 
+
 #define SCREEN_WIDTH  600
 #define SCREEN_HEIGHT 450
 #define MAP_WIDTH 60
@@ -27,72 +28,13 @@ typedef struct {
     int x, y, vie=45;
 } murCassable;
 murCassable mc[10];
-/*
- * elements classes dans l'ordre ascii
- * ` = mur
- * agms = levier monte, baisse, porte violet fermee, ouvert
- * bhnt = levier monte, baisse, porte orange fermee, ouvert
- * ciou = levier monte, baisse, porte blanc fermee, ouvert
- * djpv = levier monte, baisse, porte vert fermee, ouvert
- * ekqw = levier monte, baisse, porte marron fermee, ouvert
- * flrx = levier monte, baisse, porte noir fermee, ouvert
- * y = crane fin du jeu
- */
-int gameover, visionLevier, visionFin, typeL;
+
+int gameover, vie=100, visionLevier, visionFin, typeL;
 int avancer, lateral, tourner, tir, murC;
 float perso_angle,perso_x,perso_y;
-char map[MAP_WIDTH*MAP_HEIGHT+1]="\
-````````````````````````````````````````d```````````````````\
-`         `    `       m   `   `          `                `\
-`         `  ` `       ``  ` ` `          `                `\
-`         `  `         ``  ` ` `          `                `\
-`         ^  `         ``  ` ` `          `                `\
-`         ````         `b  ` ` `          `                `\
-`         `a    ```````````` ` `          `                `\
-`````n``````````             ` `          `                `\
-`         ``               ``` `          `                `\
-`         ^o               ``` `          `                `\
-`         `````            ``` `````````  `                `\
-`         ^# c`            ``` ^          `                `\
-`         `````````````````````````````````                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-``````p````                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`         `                                                `\
-`````y`````                                                `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-`                                                          `\
-````````````````````````````````````````````````````````````";
-
 char mat_perso[MAP_HEIGHT][MAP_WIDTH], dir;
 SDL_Surface *murDraw, *screen=SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0), *pistolet, *monstreDraw, *casque;
-SDL_Rect posPistolet, rectPistolet, posCasque;
+SDL_Rect posPistolet, rectPistolet, posCasque, barreVie;
 
 void FillMat()
 {
@@ -134,7 +76,7 @@ void putpixel(SDL_Surface *sdl_screen_, int x, int y, Uint32 pixel) {
   if(pixel==SDL_MapRGB(pistolet->format, 0, 255, 255)) return;
   Uint8 *p = (Uint8 *)sdl_screen_->pixels + y*sdl_screen_->pitch + x*sdl_screen_->format->BytesPerPixel;
   for (int i=0; i<sdl_screen_->format->BytesPerPixel; i++) {
-    //p[i] = ((Uint8*)&pixel)[i];
+    p[i] = ((Uint8*)&pixel)[i];
   }
 }
 
@@ -359,6 +301,14 @@ void draw(SDL_Surface *screen, int k) {
   perso.y = monster.y*PERSO_WIDTH-1;
   SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,255,0));
   SDL_BlitSurface(casque, NULL, screen, &posCasque);
+  barreVie.x=0;
+  barreVie.y=0;
+  barreVie.w=127;
+  barreVie.h=153;
+  SDL_FillRect(screen,&barreVie,SDL_MapRGB(screen->format,0,0,0));
+  barreVie.y=barreVie.h-vie;
+  barreVie.h=vie;
+  SDL_FillRect(screen,&barreVie,SDL_MapRGB(screen->format,255,0,0));
   drawPistolet(screen, k);
 }
 void HandleEvent(SDL_Event event){
@@ -732,9 +682,9 @@ int main (int argc, char*args[]){
   murDraw = SDL_LoadBMP("walltext.bmp");
   monstreDraw = SDL_LoadBMP("monstre.bmp");
   casque = SDL_LoadBMP("visionCasque.bmp");
+  SDL_SetColorKey(casque, SDL_SRCCOLORKEY, SDL_MapRGB(casque->format, 0, 255, 255));
   SDL_SetColorKey(pistolet, SDL_SRCCOLORKEY, SDL_MapRGB(pistolet->format, 0, 255, 255));
   SDL_SetColorKey(monstreDraw, SDL_SRCCOLORKEY, SDL_MapRGB(monstreDraw->format, 0, 255, 255));
-  SDL_SetColorKey(casque, SDL_SRCCOLORKEY, SDL_MapRGB(casque->format, 0, 255, 255));
   SDL_SetColorKey(murDraw, SDL_SRCCOLORKEY, SDL_MapRGB(murDraw->format, 0, 255, 255));
   rectPistolet.y=0;
   rectPistolet.h=pistolet->h;
@@ -784,12 +734,12 @@ int main (int argc, char*args[]){
   monster.angle = 0;
   monster.dir = 0;
   
-  for(int i=0;i<MAP_HEIGHT;i++){
+  /*for(int i=0;i<MAP_HEIGHT;i++){
     for(int j=0;j<MAP_WIDTH;j++){
       printf("%c", mat_perso[i][j]);
     }
     printf("\n");
-  }
+  }*/
   
   
   while (!gameover){
@@ -820,7 +770,6 @@ int main (int argc, char*args[]){
       draw(screen, 0);
       SDL_UpdateRect(screen, 0, 0, 0, 0);
     }
-    
   }
   SDL_FreeSurface(screen);
   SDL_FreeSurface(murDraw);

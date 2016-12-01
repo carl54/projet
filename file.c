@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAP_WIDTH 24
-#define MAP_HEIGHT 24
+#define MAP_WIDTH 60
+#define MAP_HEIGHT 60
 
 /*
  * elements classes dans l'ordre ascii
@@ -13,21 +13,57 @@
  * djpv = levier monte, baisse, porte vert fermee, ouvert
  * ekqw = levier monte, baisse, porte marron fermee, ouvert
  * flrx = levier monte, baisse, porte noir fermee, ouvert
+ * ^ = mur cassable
+ * y = crane fin du jeu
  */
-
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
-``````f`r```````````````\
-`         `    `       `\
-`         e  ```       `\
-`         `  `         `\
-`         ^  ``        `\
-`         ``           `\
-`         q    ```     `\
-`         ``   `       `\
-c          d   `       `\
-`          `   ```     `\
-o          p           `\
-`a`m`b`n````````````````";
+````````````````````````````````````````d```````````````````\
+`         `    `       m   `   `          `                `\
+`         `  ` `       ``  ` ` `          `                `\
+`         `  `         ``  ` ` `          `                `\
+`         ^  `         ``  ` ` `          `                `\
+`         ````         `b  ` ` `          `                `\
+`         `a    ```````````` ` `          `                `\
+`````n``````````             ` `          `                `\
+`         ``               ``` `          `                `\
+`         ^o               ``` `          `                `\
+`         `````            ``` `````````  `                `\
+`         ^# c`            ``` ^          `                `\
+`         `````````````````````````````````                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+``````p````                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`````y`````                                                `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+````````````````````````````````````````````````````````````";
 
 void GetMap()
 {
