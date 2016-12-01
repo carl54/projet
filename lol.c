@@ -94,6 +94,31 @@ char mat_perso[MAP_HEIGHT][MAP_WIDTH], dir;
 SDL_Surface *murDraw, *screen=SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0), *pistolet, *monstreDraw, *casque;
 SDL_Rect posPistolet, rectPistolet, posCasque;
 
+void FillMat()
+{
+  int i,j,murCass=0;
+  char c;
+  FILE* fichier = NULL;
+  fichier = fopen("map.vuz","r");
+  if(fichier !=NULL){
+    for (i=0;i<MAP_WIDTH;i++){
+      for (j=0;j<MAP_HEIGHT;j++){
+        c=fgetc(fichier);
+	    mat_perso[i][j] = c;
+        if(c)=='^'){
+          mc[murCass].x=i;
+          mc[murCass].y=j;
+          murCass++;
+        }
+      }
+    }
+    fclose(fichier);
+  }
+  else{
+    printf("FATAL_ERROR_404\n");
+  }
+}
+
 Uint32 getpixel(SDL_Surface *tex, int x, int y, int numText) {
   int texw = tex->w;
   int texh = tex->h-1;
@@ -113,22 +138,6 @@ void putpixel(SDL_Surface *sdl_screen_, int x, int y, Uint32 pixel) {
   }
 }
 
-void fillMat(char map[], char mat[][MAP_HEIGHT]){
-  int comp, i, j;
-  comp = 0;
-  int murCass=0;
-  for(i = 0 ; i<MAP_HEIGHT ; i++){
-    for(j=0 ; j<MAP_WIDTH; j++){
-      mat[i][j]=map[comp];
-      if(map[comp]=='^'){
-        mc[murCass].x=i;
-        mc[murCass].y=j;
-        murCass++;
-      }
-      comp++;
-    }
-  }
-}
 //retoune 1 si le char désigne une case de levier levé, -1 si c'est un levier baissé, et 0 si ce n'en est pas un
 int isLevier(char c){
   if(c>='a' && c<='f') return 1;
@@ -229,10 +238,11 @@ void draw(SDL_Surface *screen, int k) {
   int i, j, w, h, taille;
   float angle_vue, dist, angle_ray, ray_x, ray_y, t;
   SDL_Rect wall, perso, tmp, half_screen, lol, miniMap;
-  half_screen.w = SCREEN_WIDTH/4;
+  half_screen.w = SCREEN_WIDTH;
   half_screen.h = SCREEN_HEIGHT;
   half_screen.x = 0;
   half_screen.y = 0;
+  /*
   SDL_FillRect(screen, &half_screen, SDL_MapRGB(screen->format, 65, 69, 76));
   half_screen.x = SCREEN_WIDTH/4;
   
@@ -240,7 +250,7 @@ void draw(SDL_Surface *screen, int k) {
   half_screen.w = SCREEN_WIDTH;
   half_screen.y = 0;
   half_screen.x = 0;
-  
+  */
   SDL_FillRect(screen, &half_screen, SDL_MapRGB(screen->format, 65, 69, 76));
   
   
@@ -548,15 +558,15 @@ void deplacer() {
   
   switch (tourner){
     case 1:
-      if (perso_angle < M_PI/12){
-        perso_angle = perso_angle+2*M_PI;
+      if (perso_angle < 0){
+        perso_angle = fmod(perso_angle,2*M_PI);
       }
       perso_angle = perso_angle-M_PI/100;
       break;
     
     case -1:
-      if(perso_angle > 23*M_PI/12){
-        perso_angle = perso_angle-2*M_PI;
+      if(perso_angle > 2*M_PI){
+        perso_angle = fmod(perso_angle,2*M_PI);
       }
       perso_angle=perso_angle+M_PI/100;
       break;
@@ -748,8 +758,7 @@ int main (int argc, char*args[]){
       mat_perso[i][j]=' ';
     }
   }
-  
-  fillMat(map, mat_perso);
+  FillMat();
   
   //placement du perso dans la premiere case vide de la matrice
   for(i=0;i<MAP_HEIGHT;i++){
@@ -766,13 +775,12 @@ int main (int argc, char*args[]){
   label:
   
   perso_angle = 0;
-  
+  //placement du monstre dans une case random
   do {
     monster.x = rand()%MAP_HEIGHT;
     monster.y = rand()%MAP_WIDTH;
   } while (mat_perso[int(monster.y)][int(monster.x)]!=' ');
   mat_perso[int(monster.y)][int(monster.x)] = '#';
-  //printf("%d, %d\n", monster.x, monster.y);
   monster.angle = 0;
   monster.dir = 0;
   
@@ -815,6 +823,10 @@ int main (int argc, char*args[]){
     
   }
   SDL_FreeSurface(screen);
+  SDL_FreeSurface(murDraw);
+  SDL_FreeSurface(monstreDraw);
+  SDL_FreeSurface(pistolet);
+  SDL_FreeSurface(casque);
   SDL_Quit();
   
   return 0;

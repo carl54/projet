@@ -1,22 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAP_WIDTH 12
-#define MAP_HEIGHT 12
+#define MAP_WIDTH 24
+#define MAP_HEIGHT 24
+
+/*
+ * elements classes dans l'ordre ascii
+ * ` = mur
+ * agms = levier monte, baisse, porte violet fermee, ouvert
+ * bhnt = levier monte, baisse, porte orange fermee, ouvert
+ * ciou = levier monte, baisse, porte blanc fermee, ouvert
+ * djpv = levier monte, baisse, porte vert fermee, ouvert
+ * ekqw = levier monte, baisse, porte marron fermee, ouvert
+ * flrx = levier monte, baisse, porte noir fermee, ouvert
+ */
 
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
-############\
-#          #\
-#          #\
-#          #\
-#  #       #\
-####       #\
-#     #    #\
-#     ##   #\
-# ##   #   #\
-# ##   #   #\
-#  #   #   #\
-############";
+``````f`r```````````````\
+`         `    `       `\
+`         e  ```       `\
+`         `  `         `\
+`         ^  ``        `\
+`         ``           `\
+`         q    ```     `\
+`         ``   `       `\
+c          d   `       `\
+`          `   ```     `\
+o          p           `\
+`a`m`b`n````````````````";
 
 void GetMap()
 {
@@ -33,7 +44,7 @@ void GetMap()
       fclose(fichier);
     }
   else{
-    printf("FATAL_ERROR_403\n");
+    printf("FATAL_ERROR_404\n");
   }
 }
 
