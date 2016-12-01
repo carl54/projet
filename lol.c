@@ -8,8 +8,8 @@
 
 #define SCREEN_WIDTH  600
 #define SCREEN_HEIGHT 450
-#define MAP_WIDTH 24
-#define MAP_HEIGHT 24
+#define MAP_WIDTH 60
+#define MAP_HEIGHT 60
 #define WALL_WIDTH 16
 #define PERSO_WIDTH 16
 #define FOV M_PI/3
@@ -26,7 +26,7 @@ monstre monster;
 typedef struct {
     int x, y, vie=45;
 } murCassable;
-murCassable mc1, mc2;
+murCassable mc[10];
 /*
  * elements classes dans l'ordre ascii
  * ` = mur
@@ -36,25 +36,61 @@ murCassable mc1, mc2;
  * djpv = levier monte, baisse, porte vert fermee, ouvert
  * ekqw = levier monte, baisse, porte marron fermee, ouvert
  * flrx = levier monte, baisse, porte noir fermee, ouvert
+ * y = crane fin du jeu
  */
-int gameover, visionLevier, typeL;
-int avancer, lateral, tourner, tir;
+int gameover, visionLevier, visionFin, typeL;
+int avancer, lateral, tourner, tir, murC;
 float perso_angle,perso_x,perso_y;
 char map[MAP_WIDTH*MAP_HEIGHT+1]="\
-``````f`r```````````````\
-`         `    `       `\
-`         e  ```       `\
-`         `  `         `\
-`         ^  ``        `\
-`         ``           `\
-`         q    ```     `\
-`         ``   `       `\
-c          d   `       `\
-`          `   ```     `\
-o          p           `\
-`a`m`b`n````````````````";
+````````````````````````````````````````d```````````````````\
+`         `    `       m   `   `          `                `\
+`         `  ` `       ``  ` ` `          `                `\
+`         `  `         ``  ` ` `          `                `\
+`         ^  `         ``  ` ` `          `                `\
+`         ````         `b  ` ` `          `                `\
+`         `a    ```````````` ` `          `                `\
+`````n``````````             ` `          `                `\
+`         ``               ``` `          `                `\
+`         ^o               ``` `          `                `\
+`         `````            ``` `````````  `                `\
+`         ^# c`            ``` ^          `                `\
+`         `````````````````````````````````                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+``````p````                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`         `                                                `\
+`````y`````                                                `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+`                                                          `\
+````````````````````````````````````````````````````````````";
 
-char mat_perso[24][24], dir;
+char mat_perso[MAP_HEIGHT][MAP_WIDTH], dir;
 SDL_Surface *murDraw, *screen=SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0), *pistolet, *monstreDraw, *casque;
 SDL_Rect posPistolet, rectPistolet, posCasque;
 
@@ -77,13 +113,18 @@ void putpixel(SDL_Surface *sdl_screen_, int x, int y, Uint32 pixel) {
   }
 }
 
-void fillMat(char map[], char mat[][24]){
+void fillMat(char map[], char mat[][MAP_HEIGHT]){
   int comp, i, j;
   comp = 0;
-  
-  for(i = 0 ; i<24 ; i++){
-    for(j=0 ; j<24 ; j++){
+  int murCass=0;
+  for(i = 0 ; i<MAP_HEIGHT ; i++){
+    for(j=0 ; j<MAP_WIDTH; j++){
       mat[i][j]=map[comp];
+      if(map[comp]=='^'){
+        mc[murCass].x=i;
+        mc[murCass].y=j;
+        murCass++;
+      }
       comp++;
     }
   }
@@ -100,7 +141,7 @@ int isPorte(char c){
   return 0;
 }
 int isMur(char c){
-  if(c>='^' && c<='`') return 1;
+  if((c>='^' && c<='`') || c=='y') return 1;
   return 0;
 }
 int isOpenDoor(char c){
@@ -110,8 +151,8 @@ int isOpenDoor(char c){
 
 void openDoor(char c){
   
-  for(int i=0;i<24;i++){
-    for(int j=0;j<24;j++){
+  for(int i=0;i<MAP_HEIGHT;i++){
+    for(int j=0;j<MAP_WIDTH;j++){
       if(mat_perso[i][j]==c+6){
         mat_perso[i][j]=c+12;
         printf("%c\n", c+12);
@@ -126,8 +167,8 @@ void openDoor(char c){
 }
 
 void closeDoor(char c ){
-  for(int i=0;i<24;i++){
-    for(int j=0;j<24;j++){
+  for(int i=0;i<MAP_HEIGHT;i++){
+    for(int j=0;j<MAP_WIDTH;j++){
       if(mat_perso[i][j]==c+18){
         mat_perso[i][j]=c+12;
         printf("%c\n", mat_perso[i][j]);
@@ -144,6 +185,12 @@ void drawPistolet(SDL_Surface *screen, int numPistolet){
   SDL_BlitSurface(pistolet, &rectPistolet, screen, &posPistolet);
 }
 
+int getMurCassable(int x, int y){
+  for (int i=0 ; i<10 ; i++){
+    if (mc[i].x==y && mc[i].y==x) return i;
+  }
+}
+
 float max(float a, float b) {
   return a<b ? b : a;
 }
@@ -154,7 +201,7 @@ void drawTexture(SDL_Surface *screen, SDL_Surface *tex, float x, float y, SDL_Re
     int ty = float(i)/float(wall.h)*tex->h;
     Uint32 color = getpixel(tex, tx, ty, numText);
     //if(color != SDL_MapRGB(pistolet->format, 0, 255, 255))
-      putpixel(screen, wall.x, wall.y+i, color);
+    putpixel(screen, wall.x, wall.y+i, color);
   }
 }
 
@@ -227,32 +274,39 @@ void draw(SDL_Surface *screen, int k) {
             monster.vie--;
           }
           if (mat_perso[int(ray_y)][int(ray_x)] == '^' || mat_perso[int(ray_y)][int(ray_x)] == '_') {
-            printf("%d\n", mc1.vie);
-            mc1.vie--;
-            if(mc1.vie==15) mat_perso[int(ray_y)][int(ray_x)]='_';
-            if (mc1.vie==0) mat_perso[int(ray_y)][int(ray_x)]=' ';
+            murC = getMurCassable(int(ray_x), int(ray_y));
+            printf("%d, %d\n", murC, mc[murC].vie);
+            mc[murC].vie--;
+            if(mc[murC].vie==15) mat_perso[int(ray_y)][int(ray_x)]='_';
+            if (mc[murC].vie==0) mat_perso[int(ray_y)][int(ray_x)]=' ';
           }
         }
-        if (mat_perso[int(ray_y)][int(ray_x)] >= '^' &&
-            mat_perso[int(ray_y)][int(ray_x)] <= 'r') {
+        
+        if ((mat_perso[int(ray_y)][int(ray_x)] >= '^' &&
+             mat_perso[int(ray_y)][int(ray_x)] <= 'r')) {
           
+                     drawTexture(screen, murDraw, ray_x, ray_y, tmp,(mat_perso[int(ray_y)][int(ray_x)] - '^'));
           
-          drawTexture(screen, murDraw, ray_x, ray_y, tmp,
-                      (mat_perso[int(ray_y)][int(ray_x)] - '^'));
           visionLevier = 1;
           tmp.h = (screen->h - tmp.h) / 2;
           //printf("h=%d\n", tmp.h);
-          tmp.y = h + tmp.h;
+          //tmp.y = h + tmp.h;
           //drawSol(screen, tmp, 0, dist);
           //if(visionLevier) printf("%d\n", visionLevier);
           break;
         }
+        if(mat_perso[int(ray_y)][int(ray_x)] == 'y' || mat_perso[int(ray_y)][int(ray_x)] == 'z'){
+          visionFin = 1;
+          drawTexture(screen, murDraw, ray_x, ray_y, tmp,mat_perso[int(ray_y)][int(ray_x)]-100);
+          break;
+        }
+          
         if(mat_perso[int(ray_y)][int(ray_x)] == '#'&&monster.vie>0){
           drawTexture(screen, monstreDraw, ray_x, ray_y, tmp, 0);
           break;
         }
       } else {
-        
+        visionFin = 0;
         visionLevier = 0;
       }
     }
@@ -265,7 +319,7 @@ void draw(SDL_Surface *screen, int k) {
   SDL_FillRect(screen, &miniMap, SDL_MapRGB(screen->format, 0, 0, 0));
   w = 472;
   wall.w = (SCREEN_WIDTH-w)/MAP_WIDTH;
-  wall.h = (SCREEN_HEIGHT-153)/MAP_HEIGHT;
+  wall.h = (180)/MAP_HEIGHT;
   for (i = 0; i < MAP_WIDTH; i++) {         //vue 2D
     for (j = 0; j < MAP_HEIGHT; j++) {
       if (isMur(mat_perso[i][j]) || isPorte(mat_perso[i][j]) || isLevier(mat_perso[i][j])) {
@@ -282,9 +336,9 @@ void draw(SDL_Surface *screen, int k) {
   perso.h = 9;
   perso.x = perso_x*wall.w+w-4;
   perso.y = perso_y*wall.h-4;
-  //SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,255,255,255));
+  SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,255,255,255));
   
-  /*perso.w = 9;
+  perso.w = 9;
   perso.h = 9;
   perso.x = monster.x*PERSO_WIDTH+w-4;
   perso.y = monster.y*PERSO_WIDTH-4;
@@ -292,7 +346,7 @@ void draw(SDL_Surface *screen, int k) {
   perso.w = 3;
   perso.h = 3;
   perso.x = monster.x*PERSO_WIDTH+w-1;
-  perso.y = monster.y*PERSO_WIDTH-1;*/
+  perso.y = monster.y*PERSO_WIDTH-1;
   SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,255,0));
   SDL_BlitSurface(casque, NULL, screen, &posCasque);
   drawPistolet(screen, k);
@@ -340,30 +394,59 @@ void HandleEvent(SDL_Event event){
           break;
         
         case SDLK_SPACE:
-          if(visionLevier && (isLevier(mat_perso[int(perso_y+1)][int(perso_x)]) || isLevier(mat_perso[int(perso_y)][int(perso_x+1)])
-                              ||isLevier(mat_perso[int(perso_y-1)][int(perso_x)]) || isLevier(mat_perso[int(perso_y)][int(perso_x-1)]))){
+          if(visionLevier){
             if(typeL = isLevier(mat_perso[int(perso_y+1)][int(perso_x)])){
               mat_perso[int(perso_y+1)][int(perso_x)] += 6*typeL;
               if(typeL==1) openDoor(mat_perso[int(perso_y+1)][int(perso_x)]);
               if(typeL==-1) closeDoor(mat_perso[int(perso_y+1)][int(perso_x)]);
+            } else {
+              if (typeL = isLevier(mat_perso[int(perso_y)][int(perso_x + 1)])) {
+                mat_perso[int(perso_y)][int(perso_x + 1)] += 6 * typeL;
+                if (typeL == 1)
+                  openDoor(mat_perso[int(perso_y)][int(perso_x + 1)]);
+                if (typeL == -1)
+                  closeDoor(mat_perso[int(perso_y)][int(perso_x + 1)]);
+              } else {
+                if (typeL = isLevier(
+                        mat_perso[int(perso_y - 1)][int(perso_x)])) {
+                  mat_perso[int(perso_y - 1)][int(perso_x)] += 6 * typeL;
+                  if (typeL == 1)
+                    openDoor(mat_perso[int(perso_y - 1)][int(perso_x)]);
+                  if (typeL == -1)
+                    closeDoor(mat_perso[int(perso_y - 1)][int(perso_x)]);
+                } else {
+                  if (typeL = isLevier(
+                          mat_perso[int(perso_y)][int(perso_x - 1)])) {
+                    mat_perso[int(perso_y)][int(perso_x - 1)] += 6 * typeL;
+                    if (typeL == 1)
+                      openDoor(mat_perso[int(perso_y)][int(perso_x) - 1]);
+                    if (typeL == -1)
+                      closeDoor(mat_perso[int(perso_y)][int(perso_x) - 1]);
+                  }else{
+                    tir=1;
+                  }
+                }
+              }
             }
-            if(typeL = isLevier(mat_perso[int(perso_y)][int(perso_x+1)])){
-              mat_perso[int(perso_y)][int(perso_x+1)] += 6*typeL;
-              if(typeL==1) openDoor(mat_perso[int(perso_y)][int(perso_x+1)]);
-              if(typeL==-1) closeDoor(mat_perso[int(perso_y)][int(perso_x+1)]);
+          }
+          if(visionFin){
+            if(typeL = mat_perso[int(perso_y+1)][int(perso_x)]=='y'){
+              mat_perso[int(perso_y+1)][int(perso_x)] ++;
+            } else {
+              if (typeL = mat_perso[int(perso_y)][int(perso_x + 1)]=='y') {
+                mat_perso[int(perso_y)][int(perso_x + 1)] ++;
+              } else {
+                if (typeL = mat_perso[int(perso_y - 1)][int(perso_x)]=='y') {
+                  mat_perso[int(perso_y - 1)][int(perso_x)] ++;
+                } else {
+                  if (typeL = mat_perso[int(perso_y)][int(perso_x - 1)]=='y') {
+                    mat_perso[int(perso_y)][int(perso_x - 1)] ++;
+                  }else{
+                    tir=1;
+                  }
+                }
+              }
             }
-            if(typeL = isLevier(mat_perso[int(perso_y-1)][int(perso_x)])){
-              mat_perso[int(perso_y-1)][int(perso_x)] += 6*typeL;
-              if(typeL==1) openDoor(mat_perso[int(perso_y-1)][int(perso_x)]);
-              if(typeL==-1) closeDoor(mat_perso[int(perso_y-1)][int(perso_x)]);
-            }
-            if(typeL = isLevier(mat_perso[int(perso_y)][int(perso_x-1)])){
-              mat_perso[int(perso_y)][int(perso_x-1)] += 6*typeL;
-              if(typeL==1) openDoor(mat_perso[int(perso_y)][int(perso_x)-1]);
-              if(typeL==-1) closeDoor(mat_perso[int(perso_y)][int(perso_x)-1]);
-            }
-          }else{
-            tir=1;
           }
           break;
       }
@@ -462,9 +545,6 @@ void deplacer() {
       }
       break;
   }
-  
-  
-  
   
   switch (tourner){
     case 1:
@@ -652,8 +732,6 @@ int main (int argc, char*args[]){
   posPistolet.h = SCREEN_WIDTH/4;
   posPistolet.x=SCREEN_WIDTH/2-pistolet->w/6;
   posPistolet.y = 342-pistolet->h;
-  mc1.x=10;
-  mc1.y=4;
   // create window
   //screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
   // set keyboard repeat
@@ -665,8 +743,8 @@ int main (int argc, char*args[]){
   srand(time(NULL));
   
   //rempli la matrice avec ' '
-  for(i=0;i<24;i++){
-    for(j=0;j<24;j++){
+  for(i=0;i<MAP_HEIGHT;i++){
+    for(j=0;j<MAP_WIDTH;j++){
       mat_perso[i][j]=' ';
     }
   }
@@ -674,8 +752,8 @@ int main (int argc, char*args[]){
   fillMat(map, mat_perso);
   
   //placement du perso dans la premiere case vide de la matrice
-  for(i=0;i<24;i++){
-    for(j=0;j<24;j++){
+  for(i=0;i<MAP_HEIGHT;i++){
+    for(j=0;j<MAP_WIDTH;j++){
       if(mat_perso[i][j]==' '){
         mat_perso[i][j]='0';
         perso_x=j+0.1;
@@ -694,11 +772,12 @@ int main (int argc, char*args[]){
     monster.y = rand()%MAP_WIDTH;
   } while (mat_perso[int(monster.y)][int(monster.x)]!=' ');
   mat_perso[int(monster.y)][int(monster.x)] = '#';
+  //printf("%d, %d\n", monster.x, monster.y);
   monster.angle = 0;
   monster.dir = 0;
   
-  for(int i=0;i<24;i++){
-    for(int j=0;j<24;j++){
+  for(int i=0;i<MAP_HEIGHT;i++){
+    for(int j=0;j<MAP_WIDTH;j++){
       printf("%c", mat_perso[i][j]);
     }
     printf("\n");
@@ -719,6 +798,7 @@ int main (int argc, char*args[]){
         }
         deplacer();
         move_monster();
+        //printf("%d, %d\n", monster.x, monster.y);
         draw(screen, k/15);
         SDL_UpdateRect(screen, 0, 0, 0, 0);
       }
