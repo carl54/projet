@@ -105,7 +105,7 @@ void FillMat()
       for (j=0;j<MAP_HEIGHT;j++){
         c=fgetc(fichier);
 	    mat_perso[i][j] = c;
-        if(c)=='^'){
+        if(c=='^'){
           mc[murCass].x=i;
           mc[murCass].y=j;
           murCass++;
@@ -134,7 +134,7 @@ void putpixel(SDL_Surface *sdl_screen_, int x, int y, Uint32 pixel) {
   if(pixel==SDL_MapRGB(pistolet->format, 0, 255, 255)) return;
   Uint8 *p = (Uint8 *)sdl_screen_->pixels + y*sdl_screen_->pitch + x*sdl_screen_->format->BytesPerPixel;
   for (int i=0; i<sdl_screen_->format->BytesPerPixel; i++) {
-    p[i] = ((Uint8*)&pixel)[i];
+    //p[i] = ((Uint8*)&pixel)[i];
   }
 }
 
