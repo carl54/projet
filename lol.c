@@ -1,4 +1,4 @@
-//g++ lol.c `sdl-config --cflags --libs` -o lol
+//g++ lol.c `sdl-config --cflags --libs` -o lol && ./lol
 #include "SDL.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,26 +37,29 @@ murCassable mc1, mc2;
  * ekqw = levier monte, baisse, porte marron fermee, ouvert
  * flrx = levier monte, baisse, porte noir fermee, ouvert
  */
-int gameover, visionLevier, typeL;
-int avancer, lateral, tourner, tir;
+int gameover, visionLevier, typeL,avancer, lateral, tourner, tir;
 float perso_angle,perso_x,perso_y;
-char map[MAP_WIDTH*MAP_HEIGHT+1]="\
-``````f`r```````````````\
-`         `    `       `\
-`         e  ```       `\
-`         `  `         `\
-`         ^  ``        `\
-`         ``           `\
-`         q    ```     `\
-`         ``   `       `\
-c          d   `       `\
-`          `   ```     `\
-o          p           `\
-`a`m`b`n````````````````";
-
-char mat_perso[24][24], dir;
+char mat_perso[MAP_HEIGHT][MAP_WIDTH], dir;
 SDL_Surface *murDraw, *screen=SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0), *pistolet, *monstreDraw, *casque;
 SDL_Rect posPistolet, rectPistolet, posCasque;
+
+void FillMat()
+{
+  int i,j;
+  FILE* fichier = NULL;
+  fichier = fopen("map.vuz","r");
+  if(fichier !=NULL){
+    for (i=0;i<MAP_WIDTH;i++){
+      for (j=0;j<MAP_HEIGHT;j++){
+	mat_perso[i][j] = fgetc(fichier);
+      }
+    }
+    fclose(fichier);
+  }
+  else{
+    printf("FATAL_ERROR_404\n");
+  }
+}
 
 Uint32 getpixel(SDL_Surface *tex, int x, int y, int numText) {
   int texw = tex->w;
@@ -77,17 +80,6 @@ void putpixel(SDL_Surface *sdl_screen_, int x, int y, Uint32 pixel) {
   }
 }
 
-void fillMat(char map[], char mat[][24]){
-  int comp, i, j;
-  comp = 0;
-  
-  for(i = 0 ; i<24 ; i++){
-    for(j=0 ; j<24 ; j++){
-      mat[i][j]=map[comp];
-      comp++;
-    }
-  }
-}
 //retoune 1 si le char désigne une case de levier levé, -1 si c'est un levier baissé, et 0 si ce n'en est pas un
 int isLevier(char c){
   if(c>='a' && c<='f') return 1;
@@ -110,8 +102,8 @@ int isOpenDoor(char c){
 
 void openDoor(char c){
   
-  for(int i=0;i<24;i++){
-    for(int j=0;j<24;j++){
+  for(int i=0;i<MAP_WIDTH;i++){
+    for(int j=0;j<MAP_HEIGHT;j++){
       if(mat_perso[i][j]==c+6){
         mat_perso[i][j]=c+12;
         printf("%c\n", c+12);
@@ -126,8 +118,8 @@ void openDoor(char c){
 }
 
 void closeDoor(char c ){
-  for(int i=0;i<24;i++){
-    for(int j=0;j<24;j++){
+  for(int i=0;i<MAP_WIDTH;i++){
+    for(int j=0;j<MAP_HEIGHT;j++){
       if(mat_perso[i][j]==c+18){
         mat_perso[i][j]=c+12;
         printf("%c\n", mat_perso[i][j]);
@@ -182,10 +174,11 @@ void draw(SDL_Surface *screen, int k) {
   int i, j, w, h, taille;
   float angle_vue, dist, angle_ray, ray_x, ray_y, t;
   SDL_Rect wall, perso, tmp, half_screen, lol, miniMap;
-  half_screen.w = SCREEN_WIDTH/4;
+  half_screen.w = SCREEN_WIDTH;
   half_screen.h = SCREEN_HEIGHT;
   half_screen.x = 0;
   half_screen.y = 0;
+  /*
   SDL_FillRect(screen, &half_screen, SDL_MapRGB(screen->format, 65, 69, 76));
   half_screen.x = SCREEN_WIDTH/4;
   
@@ -193,7 +186,7 @@ void draw(SDL_Surface *screen, int k) {
   half_screen.w = SCREEN_WIDTH;
   half_screen.y = 0;
   half_screen.x = 0;
-  
+  */  
   SDL_FillRect(screen, &half_screen, SDL_MapRGB(screen->format, 65, 69, 76));
   
   
@@ -468,15 +461,15 @@ void deplacer() {
   
   switch (tourner){
     case 1:
-      if (perso_angle < M_PI/12){
-        perso_angle = perso_angle+2*M_PI;
+      if (perso_angle < 0){
+        perso_angle = fmod(perso_angle,2*M_PI);
       }
       perso_angle = perso_angle-M_PI/100;
       break;
     
     case -1:
-      if(perso_angle > 23*M_PI/12){
-        perso_angle = perso_angle-2*M_PI;
+      if(perso_angle > 2*M_PI){
+        perso_angle = fmod(perso_angle,2*M_PI);
       }
       perso_angle=perso_angle+M_PI/100;
       break;
@@ -670,8 +663,7 @@ int main (int argc, char*args[]){
       mat_perso[i][j]=' ';
     }
   }
-  
-  fillMat(map, mat_perso);
+  FillMat();
   
   //placement du perso dans la premiere case vide de la matrice
   for(i=0;i<24;i++){
@@ -688,7 +680,7 @@ int main (int argc, char*args[]){
   label:
   
   perso_angle = 0;
-  
+  //placement du monstre dans une case random
   do {
     monster.x = rand()%MAP_HEIGHT;
     monster.y = rand()%MAP_WIDTH;
@@ -696,14 +688,14 @@ int main (int argc, char*args[]){
   mat_perso[int(monster.y)][int(monster.x)] = '#';
   monster.angle = 0;
   monster.dir = 0;
-  
+  /*
   for(int i=0;i<24;i++){
     for(int j=0;j<24;j++){
       printf("%c", mat_perso[i][j]);
     }
     printf("\n");
   }
-  
+  */
   
   while (!gameover){
     
@@ -735,6 +727,10 @@ int main (int argc, char*args[]){
     
   }
   SDL_FreeSurface(screen);
+  SDL_FreeSurface(murDraw);
+  SDL_FreeSurface(monstreDraw);
+  SDL_FreeSurface(pistolet);
+  SDL_FreeSurface(casque);
   SDL_Quit();
   
   return 0;
