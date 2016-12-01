@@ -19,10 +19,14 @@ typedef struct {
     float y;
     float angle;
     int dir;
+    int vie=60;
 } monstre;
-
 monstre monster;
 
+typedef struct {
+    int x, y, vie=45;
+} murCassable;
+murCassable mc1, mc2;
 /*
  * elements classes dans l'ordre ascii
  * ` = mur
@@ -41,7 +45,7 @@ char map[MAP_WIDTH*MAP_HEIGHT+1]="\
 `         `    `       `\
 `         e  ```       `\
 `         `  `         `\
-`         `  ``        `\
+`         ^  ``        `\
 `         ``           `\
 `         q    ```     `\
 `         ``   `       `\
@@ -49,6 +53,7 @@ c          d   `       `\
 `          `   ```     `\
 o          p           `\
 `a`m`b`n````````````````";
+
 char mat_perso[24][24], dir;
 SDL_Surface *murDraw, *screen=SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0), *pistolet, *monstreDraw, *casque;
 SDL_Rect posPistolet, rectPistolet, posCasque;
@@ -65,6 +70,7 @@ Uint32 getpixel(SDL_Surface *tex, int x, int y, int numText) {
 
 void putpixel(SDL_Surface *sdl_screen_, int x, int y, Uint32 pixel) {
   if (x<0 || y<0 || x>=sdl_screen_->w || y>=sdl_screen_->h) return;
+  if(pixel==SDL_MapRGB(pistolet->format, 0, 255, 255)) return;
   Uint8 *p = (Uint8 *)sdl_screen_->pixels + y*sdl_screen_->pitch + x*sdl_screen_->format->BytesPerPixel;
   for (int i=0; i<sdl_screen_->format->BytesPerPixel; i++) {
     p[i] = ((Uint8*)&pixel)[i];
@@ -91,6 +97,10 @@ int isLevier(char c){
 
 int isPorte(char c){
   if(c>='m' && c<='r') return 1;
+  return 0;
+}
+int isMur(char c){
+  if(c>='^' && c<='`') return 1;
   return 0;
 }
 int isOpenDoor(char c){
@@ -143,7 +153,8 @@ void drawTexture(SDL_Surface *screen, SDL_Surface *tex, float x, float y, SDL_Re
   for (int i=0; i<wall.h; i++) {
     int ty = float(i)/float(wall.h)*tex->h;
     Uint32 color = getpixel(tex, tx, ty, numText);
-    if(color != SDL_MapRGB(pistolet->format, 0, 255, 255)) putpixel(screen, wall.x, wall.y+i, color);
+    //if(color != SDL_MapRGB(pistolet->format, 0, 255, 255))
+      putpixel(screen, wall.x, wall.y+i, color);
   }
 }
 
@@ -191,10 +202,10 @@ void draw(SDL_Surface *screen, int k) {
   //M_PI regarde a gauche
   //(3*M_PI)/2 regarde en haut
   //l'angle de vue est invers� par rapport a l'angle du perso car le repere est invers� en y donc les angles sont chang�s
-  w=450;
+  w=524;
   angle_vue = -perso_angle;
   
-  for (i = 74; i < w+74; i++) { // vue 3D
+  for (i = 74; i < w; i++) { // vue 3D
     angle_ray = angle_vue - (FOV / 2) + i * (FOV / w);
     taille = 0;
     for (t = 0; t < 48; t += .05) {
@@ -210,14 +221,24 @@ void draw(SDL_Surface *screen, int k) {
         tmp.h = h;
         tmp.x = i;
         tmp.y = (SCREEN_HEIGHT - h) / 2;
-        
-        if (mat_perso[int(ray_y)][int(ray_x)] >= '`' &&
+        if(k==1 && i==SCREEN_WIDTH/2) {
+          if (mat_perso[int(ray_y)][int(ray_x)] == '#') {
+            printf("%d\n", monster.vie);
+            monster.vie--;
+          }
+          if (mat_perso[int(ray_y)][int(ray_x)] == '^' || mat_perso[int(ray_y)][int(ray_x)] == '_') {
+            printf("%d\n", mc1.vie);
+            mc1.vie--;
+            if(mc1.vie==15) mat_perso[int(ray_y)][int(ray_x)]='_';
+            if (mc1.vie==0) mat_perso[int(ray_y)][int(ray_x)]=' ';
+          }
+        }
+        if (mat_perso[int(ray_y)][int(ray_x)] >= '^' &&
             mat_perso[int(ray_y)][int(ray_x)] <= 'r') {
-          /*if(k==1 && i==w/2){
-            printf("touché : %c\n", mat_perso[int(ray_y)][int(ray_x)]);
-          }*/
+          
+          
           drawTexture(screen, murDraw, ray_x, ray_y, tmp,
-                      (mat_perso[int(ray_y)][int(ray_x)] - '`'));
+                      (mat_perso[int(ray_y)][int(ray_x)] - '^'));
           visionLevier = 1;
           tmp.h = (screen->h - tmp.h) / 2;
           //printf("h=%d\n", tmp.h);
@@ -226,7 +247,7 @@ void draw(SDL_Surface *screen, int k) {
           //if(visionLevier) printf("%d\n", visionLevier);
           break;
         }
-        if(mat_perso[int(ray_y)][int(ray_x)] == '#'){
+        if(mat_perso[int(ray_y)][int(ray_x)] == '#'&&monster.vie>0){
           drawTexture(screen, monstreDraw, ray_x, ray_y, tmp, 0);
           break;
         }
@@ -247,7 +268,7 @@ void draw(SDL_Surface *screen, int k) {
   wall.h = (SCREEN_HEIGHT-153)/MAP_HEIGHT;
   for (i = 0; i < MAP_WIDTH; i++) {         //vue 2D
     for (j = 0; j < MAP_HEIGHT; j++) {
-      if (mat_perso[i][j] == '`' || isPorte(mat_perso[i][j]) || isLevier(mat_perso[i][j])) {
+      if (isMur(mat_perso[i][j]) || isPorte(mat_perso[i][j]) || isLevier(mat_perso[i][j])) {
         wall.x = j * wall.w + w;
         wall.y = i * wall.h;
         SDL_FillRect(screen, &wall, SDL_MapRGB(screen->format, 0, 0, 176));
@@ -261,7 +282,7 @@ void draw(SDL_Surface *screen, int k) {
   perso.h = 9;
   perso.x = perso_x*wall.w+w-4;
   perso.y = perso_y*wall.h-4;
-  SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,0,0,0));
+  //SDL_FillRect(screen,&perso,SDL_MapRGB(screen->format,255,255,255));
   
   /*perso.w = 9;
   perso.h = 9;
@@ -384,8 +405,8 @@ void HandleEvent(SDL_Event event){
 void deplacer() {
   switch (avancer) {
     case 1:
-      if (mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
-              perso_x + cos(perso_angle) * 0.5)] != '`' && !isLevier(
+      if (!isMur(mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
+              perso_x + cos(perso_angle) * 0.5)]) && !isLevier(
               mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
                       perso_x + cos(perso_angle) * 0.5)])
           && !isPorte(mat_perso[int(perso_y - sin(perso_angle) * 0.5)][int(
@@ -399,8 +420,8 @@ void deplacer() {
       break;
     
     case -1:
-      if (mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
-              perso_x - cos(perso_angle) * 0.5)] != '`'
+      if (!isMur(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
+              perso_x - cos(perso_angle) * 0.5)])
           && !isLevier(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
               perso_x - cos(perso_angle) * 0.5)])
           && !isPorte(mat_perso[int(perso_y + sin(perso_angle) * 0.5)][int(
@@ -414,8 +435,8 @@ void deplacer() {
   }
   switch (lateral) {
     case 1:
-      if (mat_perso[int(perso_y - sin(perso_angle-M_PI/2) * 0.5)][int(
-              perso_x + cos(perso_angle-M_PI/2) * 0.5)] != '`'
+      if (!isMur(mat_perso[int(perso_y - sin(perso_angle-M_PI/2) * 0.5)][int(
+              perso_x + cos(perso_angle-M_PI/2) * 0.5)])
           && !isLevier(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
               perso_x + cos(perso_angle-M_PI/2) * 0.5)])
           && !isPorte(mat_perso[int(perso_y - sin(perso_angle-M_PI/2) * 0.5)][int(
@@ -428,8 +449,8 @@ void deplacer() {
       break;
     
     case -1:
-      if (mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
-              perso_x + cos(perso_angle+M_PI/2) * 0.5)] != '`'
+      if (!isMur(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
+              perso_x + cos(perso_angle+M_PI/2) * 0.5)])
           && !isLevier(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
               perso_x + cos(perso_angle+M_PI/2) * 0.5)])
           && !isPorte(mat_perso[int(perso_y - sin(perso_angle+M_PI/2) * 0.5)][int(
@@ -467,27 +488,30 @@ void deplacer() {
 void move_monster(){
   float tmp_x,tmp_y,tmp_angle;
   int sens;
-  if (monster.dir == 0){
-    monster.dir = rand()%100;
-    tmp_angle = fmod(rand(),M_PI/2);
-    sens = rand()%2;
-    if(sens == 1){
-      monster.angle = monster.angle+tmp_angle;
-    }else{
-      monster.angle = monster.angle-tmp_angle;
+  if(monster.vie>0) {
+    if (monster.dir == 0) {
+      monster.dir = rand() % 100;
+      tmp_angle = fmod(rand(), M_PI / 2);
+      sens = rand() % 2;
+      if (sens == 1) {
+        monster.angle = monster.angle + tmp_angle;
+      } else {
+        monster.angle = monster.angle - tmp_angle;
+      }
     }
-  }
-  tmp_x = monster.x+cos(monster.angle)*0.05;
-  tmp_y = monster.y-sin(monster.angle)*0.05;
-  if (mat_perso[int(tmp_y)][int(tmp_x)] >='`' && mat_perso[int(tmp_y)][int(tmp_x)]<'s' ){
-    monster.dir = 0;
-  }else{
-    mat_perso[int(monster.y)][int(monster.x)] = ' ';
-    monster.x = tmp_x;
-    monster.y = tmp_y;
-    mat_perso[int(tmp_y)][int(tmp_x)] = '#';
-    monster.dir--;
-  }
+    tmp_x = monster.x + cos(monster.angle) * 0.05;
+    tmp_y = monster.y - sin(monster.angle) * 0.05;
+    if (mat_perso[int(tmp_y)][int(tmp_x)] >= '^' &&
+        mat_perso[int(tmp_y)][int(tmp_x)] < 's') {
+      monster.dir = 0;
+    } else {
+      mat_perso[int(monster.y)][int(monster.x)] = ' ';
+      monster.x = tmp_x;
+      monster.y = tmp_y;
+      mat_perso[int(tmp_y)][int(tmp_x)] = '#';
+      monster.dir--;
+    }
+  }else mat_perso[int(monster.y)][int(monster.x)] = ' ';
 }
 //les parametre sont en float pour savoir a partir de quelle colonne de pixel on affiche la texture
 /*void drawTexture(SDL_Surface *screen, float x, float y, SDL_Rect wall, int numText){
@@ -621,13 +645,15 @@ int main (int argc, char*args[]){
   SDL_SetColorKey(pistolet, SDL_SRCCOLORKEY, SDL_MapRGB(pistolet->format, 0, 255, 255));
   SDL_SetColorKey(monstreDraw, SDL_SRCCOLORKEY, SDL_MapRGB(monstreDraw->format, 0, 255, 255));
   SDL_SetColorKey(casque, SDL_SRCCOLORKEY, SDL_MapRGB(casque->format, 0, 255, 255));
+  SDL_SetColorKey(murDraw, SDL_SRCCOLORKEY, SDL_MapRGB(murDraw->format, 0, 255, 255));
   rectPistolet.y=0;
   rectPistolet.h=pistolet->h;
   posPistolet.w = SCREEN_WIDTH/4;
   posPistolet.h = SCREEN_WIDTH/4;
-  posPistolet.x=SCREEN_WIDTH/2;
+  posPistolet.x=SCREEN_WIDTH/2-pistolet->w/6;
   posPistolet.y = 342-pistolet->h;
-  
+  mc1.x=10;
+  mc1.y=4;
   // create window
   //screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
   // set keyboard repeat
