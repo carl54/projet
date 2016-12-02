@@ -30,7 +30,7 @@ typedef struct {
 } murCassable;
 murCassable mc[20];
 
-int gameover, defaite=0, victoire=0, vie, visionLevier, visionFin, typeL, avancer, lateral, tourner, tir, murC;
+int gameover, defaite, victoire, vie, visionLevier, visionFin, typeL, avancer, lateral, tourner, tir, murC;
 float perso_angle,perso_x,perso_y;
 char mat_perso[MAP_HEIGHT][MAP_WIDTH], dir;
 SDL_Surface *murDraw, *screen, *pistolet, *monstreDraw, *casque;
@@ -82,6 +82,8 @@ void FillMat(int num) {
           perso_y=i;
           perso_angle = 0;
           vie=100;
+          victoire=0;
+          defaite=0;
         }
       }
     }
@@ -556,7 +558,7 @@ void deplacer() {
 void move_monster(){
   float tmp_x,tmp_y,tmp_angle;
   int sens;
-  for (int i=0;i<5;i++){
+  for (int i=0;i<15;i++){
     if(monster[i].vie>0) {
       if (monster[i].dir == 0) {
         monster[i].dir = rand() % 100;
@@ -710,7 +712,6 @@ int main (int argc, char*args[]){
         }
         
         if(victoire){
-          sleep(2);
           printf(" _____   _____   _       _   _____   _   _____       ___   _____   _   _____   __   _   _____  \n"
                          "|  ___| | ____| | |     | | /  ___| | | |_   _|     /   | |_   _| | | /  _  \\ |  \\ | | /  ___/ \n"
                          "| |__   | |__   | |     | | | |     | |   | |      / /| |   | |   | | | | | | |   \\| | | |___  \n"
