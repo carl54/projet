@@ -15,6 +15,8 @@
 #define WALL_WIDTH 16
 #define PERSO_WIDTH 16
 #define FOV M_PI/3
+#define MUR_CASS 30
+#define MONSTR 20
 
 typedef struct {
     float x;
@@ -23,12 +25,12 @@ typedef struct {
     int dir;
     int vie;
 } monstre;
-monstre monster[15];
+monstre monster[MONSTR];
 
 typedef struct {
     int x, y, vie;
 } murCassable;
-murCassable mc[20];
+murCassable mc[MUR_CASS];
 
 int gameover, defaite, victoire, vie, visionLevier, visionFin, typeL, avancer, lateral, tourner, tir, murC;
 float perso_angle,perso_x,perso_y;
@@ -50,6 +52,7 @@ void FillMat(int num) {
       break;
     case 3:
       fichier = fopen("maps/map3.vuz","r");
+      printf("teub\n");
       break;
     default:
       printf("Erreur dans le choix du niveau\n");
@@ -170,7 +173,7 @@ void drawPistolet(SDL_Surface *screen, int numPistolet){
 
 //retourne l'indice du tableau de murs cassables qui correspond au mur dont les coordonnées sont en param
 int getMurCassable(int x, int y){
-  for (int i=0 ; i<20 ; i++){
+  for (int i=0 ; i<MUR_CASS ; i++){
     if (mc[i].x==y && mc[i].y==x) return i;
   }
 }
@@ -178,7 +181,7 @@ int getMurCassable(int x, int y){
 //retourne l'indice du tableau de mostres qui correspond au monstre dont les coordonnées sont en param
 int getMonster(int x,int y) {
   int i,res=16;
-  for (i=0;i<15;i++){
+  for (i=0;i<MONSTR;i++){
     if (int(monster[i].x)==x && int(monster[i].y)==y){
       res = i;
     }
@@ -558,7 +561,7 @@ void deplacer() {
 void move_monster(){
   float tmp_x,tmp_y,tmp_angle;
   int sens;
-  for (int i=0;i<15;i++){
+  for (int i=0;i<MONSTR;i++){
     if(monster[i].vie>0) {
       if (monster[i].dir == 0) {
         monster[i].dir = rand() % 100;
