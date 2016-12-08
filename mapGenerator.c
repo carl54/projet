@@ -186,7 +186,6 @@ void GetMap()
 	{
 	  fputc(map[i],fichier);
 	}
-      printf("truc\n");
       fclose(fichier);
     }
   else{

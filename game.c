@@ -52,7 +52,6 @@ void FillMat(int num) {
       break;
     case 3:
       fichier = fopen("maps/map3.vuz","r");
-      printf("teub\n");
       break;
     default:
       printf("Erreur dans le choix du niveau\n");
@@ -198,7 +197,7 @@ float max(float a, float b) {
 void drawTexture(SDL_Surface *screen, SDL_Surface *tex, float x, float y, SDL_Rect wall, int numText){
   int tx = max(fabs(x-floor(x+.5)), fabs(y-floor(y+.5)))*tex->h; // x-texcoord
   for (int i=0; i<wall.h; i++) {
-    int ty = float(i)/float(wall.h)*tex->h;
+    int ty = float(i)/float(wall.h)*(tex->h);
     Uint32 color = getpixel(tex, tx, ty, numText);
     putpixel(screen, wall.x, wall.y+i, color);
   }
@@ -649,9 +648,8 @@ int main (int argc, char*args[]){
         posPistolet.h = SCREEN_WIDTH / 4;
         posPistolet.x = SCREEN_WIDTH / 2 - pistolet->w / 6;
         posPistolet.y = 342 - pistolet->h;
-        // create window
-        //screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
-        // set keyboard repeat
+        
+        
         SDL_EnableKeyRepeat(1, 100);
         
         gameover = 0;
@@ -679,7 +677,6 @@ int main (int argc, char*args[]){
               SDL_UpdateRect(screen, 0, 0, 0, 0);
             }
           } else {
-            // look for an event
             if (SDL_PollEvent(&event)) {
               HandleEvent(event);
             }
